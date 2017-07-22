@@ -136,37 +136,9 @@ class Question(db.Model):
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.INTEGER, primary_key=True)
-    first_name_encrypt = db.Column(db.String)
-    last_name_encrypt = db.Column(db.String)
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
     token = db.Column(db.INTEGER, nullable=True)
-
-    @property
-    def first_name(self):
-        raise AttributeError('first_name is encrypted')
-
-    @first_name.setter
-    def first_name(self, p):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        self.first_name_encrypt = f.encrypt(p.encode('utf-8'))
-
-    def decrypt_first_name(self):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        return f.decrypt(self.first_name_encrypt).decode('utf-8')
-
-    @property
-    def last_name(self):
-        raise AttributeError('first_name is encrypted')
-
-    @last_name.setter
-    def last_name(self, p):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        if isinstance(p, str):
-            p = p.encode('utf-8')
-        self.last_name_encrypt = f.encrypt(p)
-
-    def decrypt_last_name(self):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        return f.decrypt(self.last_name_encrypt).decode('utf-8')
 
     @staticmethod
     def generate_users(count):
@@ -182,8 +154,8 @@ class User(db.Model):
             add = True
 
             for user in User.query.all():
-                if user.decrypt_first_name() == first and \
-                                user.decrypt_last_name() == last:
+                if user.first_name == first and \
+                                user.last_name == last:
                     add = False
 
             if add is False:

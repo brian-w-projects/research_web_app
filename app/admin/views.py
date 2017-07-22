@@ -77,8 +77,8 @@ def user():
             clean_first = clean(form.first.data).strip().lower()
             clean_last = clean(form.last.data).strip().lower()
             for single_user in User.query.all():
-                if single_user.decrypt_first_name() == clean_first and \
-                        single_user.decrypt_last_name() == clean_last:
+                if single_user.first_name == clean_first and \
+                        single_user.last_name == clean_last:
                     flash(u"This user already exists in database", 'error')
                     return redirect(url_for('admin.user'))
             to_add = User(first_name=clean_first, last_name=clean_last)
@@ -99,8 +99,8 @@ def token():
             clean_first = clean(form.first.data).strip().lower()
             clean_last = clean(form.last.data).strip().lower()
             for single_user in User.query.all():
-                if single_user.decrypt_first_name() == clean_first and \
-                                single_user.decrypt_last_name() == clean_last:
+                if single_user.first_name == clean_first and \
+                                single_user.last_name == clean_last:
                     if single_user.token is None:
                         while True:
                             new_token = randint(10000, 99999)

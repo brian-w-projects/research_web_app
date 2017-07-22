@@ -21,8 +21,8 @@ def index():
             user = User.query\
                 .filter(User.token == token)\
                 .first()
-            if user is not None and user.decrypt_first_name() == first_name and \
-                    user.decrypt_last_name() == last_name:
+            if user is not None and user.first_name == first_name and \
+                    user.last_name == last_name:
                 current_form = user.form \
                     .order_by(desc(Form.timestamp)) \
                     .first()
@@ -32,7 +32,7 @@ def index():
                     db.session.commit()
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
                 session['token'] = s.dumps({'auth': clean(form.token.data)})
-                session['name'] = user.decrypt_first_name() + ' ' + user.decrypt_last_name()
+                session['name'] = user.first_name + ' ' + user.last_name
                 return redirect(url_for('main.form'))
         flash(u'Please check entered data.', 'error')
         return redirect(url_for('main.index'))
