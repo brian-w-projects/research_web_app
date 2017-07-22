@@ -1,0 +1,120 @@
+{% macro radio_macro(name, num, response) %}
+  <div class="radio input-lg has-feedback">
+    {% for i in range(5) %}
+      <label class="radio-inline">
+        {% if loop.index0 == response %}
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ loop.index0 }}" checked/>
+        {% else %}
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ loop.index0 }}"/>
+        {% endif %}
+        {{ i }}
+      </label>
+    {% endfor %}
+    <span class="glyphicon form-control-feedback"></span>
+  </div>
+{% endmacro %}
+
+{% macro radio_bsw_macro(name, num, response) %}
+  <div class="radio input-lg has-feedback">
+    {% for i in ('B','S','W') %}
+      <label class="radio-inline">
+        {% if i == response %}
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ i }}" checked/>
+        {% else %}
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ i }}"/>
+        {% endif %}
+        {{ i }}
+      </label>
+      <span class="glyphicon form-control-feedback"></span>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro select_macro(name, num, response) %}
+  <select class="selectpicker show-tick" title='Select' name="{{ num }} {{ name }}">
+    {% for i in range(5) %}
+      {% if i == response %}
+        <option selected='selected' value="{{ i }}">{{ i }}</option>
+      {% else %}
+        <option value="{{ i }}">{{ i }}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro select_bsw_macro(name, num, response) %}
+  <select class="selectpicker show-tick" title='Select' name="{{ num }} {{ name }}">
+    {% for i in ('B','S','W') %}
+      {% if i == response %}
+        <option selected='selected' value="{{ i }}">{{ i }}</option>
+      {% else %}
+        <option value="{{ i }}">{{ i }}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+{% endmacro %}
+
+{% macro flashed_messages(messages) %}
+  <div class="container-fluid">
+    <div class="col-xs-10 col-xs-offset-1">
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="alert alert-danger" role="alert">
+            {{ message }}
+          </div>
+        {% elif category == 'success' %}
+          <div class="alert alert-success" role="alert">
+            {{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro display_form(to_display) %}
+  <div class="container-fluid">
+    <div class="col-xs-12">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Intensity</th>
+              <th>Frequency</th>
+              <th>Change</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for line in to_display %}
+              <tr>
+                <td class="col-xs-2">{{ line[0] }}</td>
+                <td class="col-xs-1">
+                  {% for r in range(1,line|length) %}
+                    <span class="table-{{ loop.cycle('o', 'e') }}">{{ line[r].intensity }}</span>
+                  {% endfor %}
+                </td>
+                <td class="col-xs-1">
+                  {% for r in range(1,line|length) %}
+                    {{ line[r].frequency }}
+                  {% endfor %}
+                </td>
+                <td class="col-xs-1">
+                  {% for r in range(1,line|length) %}
+                    {{ line[r].change }}
+                  {% endfor %}
+                </td>
+                <td class="col-xs-1">
+                  {% for r in range(1,line|length) %}
+                    {{ line[r].notes }}
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
