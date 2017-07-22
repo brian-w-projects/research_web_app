@@ -1,0 +1,69 @@
+{% extends 'abstract/base.html' %}
+
+{% block header %}
+  <title>Register</title>
+{% endblock %}
+
+{% block content %}
+  {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
+  <div class="container-fluid">
+    <form method="POST">
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback has-success">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+          {{ form.email(class='form-control', readonly=True) }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback has-success">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
+          {{ form.token(class='form-control', readonly=True) }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback" data-toggle="tooltip"
+            data-placement="bottom" data-trigger="'manual" title="Enter first name">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+          {{ form.first_name(class='form-control', placeholder='First Name') }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback" data-toggle="tooltip"
+            data-placement="bottom" data-trigger="'manual" title="Enter last name">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+          {{ form.last_name(class='form-control', placeholder='Last Name') }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback" data-toggle="tooltip"
+            data-placement="bottom" data-trigger="'manual" title="Must be 10 characters or more">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-barcode"></span></span>
+          {{ form.password(class='form-control', placeholder='Password') }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback" data-toggle="tooltip"
+            data-placement="bottom" data-trigger="'manual" title="Passwords must match">
+          <span class="input-group-addon"><span class="glyphicon glyphicon-barcode"></span></span>
+          {{ form.password_confirm(class='form-control', placeholder='Confirm Password') }}
+          <span class="glyphicon form-control-feedback"></span>
+        </div>
+      </div>
+      {{ form.csrf_token() }}
+      <div class="form-group">
+        <div class="col-xs-offset-4 col-xs-4">
+          {{ form.submit(class='form-control', disabled=True) }}
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/auth/register.js') }}"></script>
+{% endblock %}
