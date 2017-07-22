@@ -17,6 +17,7 @@ itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
 numpy==1.13.1
+psycopg2==2.7.2
 pycparser==2.18
 six==1.10.0
 SQLAlchemy==1.1.11
