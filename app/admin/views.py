@@ -1,6 +1,6 @@
 from flask import render_template, request, flash, redirect, url_for, abort, current_app
 from . import admin
-from .forms import NewTokenForm, NewUserForm, NewResearcherForm, RemoveResearcherForm
+from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm
 from ..models import Form, Question, User, Researcher
 from .. import db
 from random import randint
@@ -76,12 +76,15 @@ def user():
         if form.validate():
             clean_first = clean(form.first.data).strip().lower()
             clean_last = clean(form.last.data).strip().lower()
-            for single_user in User.query.all():
-                if single_user.first_name == clean_first and \
-                        single_user.last_name == clean_last:
-                    flash(u"This user already exists in database", 'error')
-                    return redirect(url_for('admin.user'))
-            to_add = User(first_name=clean_first, last_name=clean_last)
+            clean_id = clean(form.patient_id.data)
+            user = User.query \
+                .filter(User.patient_id == clean_id) \
+                .first()
+            if user is not None:
+                flash(u'A patient with this ID has already been registered', 'error')
+                return redirect(url_for('admin.user'))
+
+            to_add = User(first_name=clean_first, last_name=clean_last, patient_id = clean_id)
             db.session.add(to_add)
             db.session.commit()
             flash(u"This user has been added to database", 'success')
@@ -91,36 +94,40 @@ def user():
     return render_template('admin/user.html', form=form)
 
 
-@admin.route('/token', methods=['GET', 'POST'])
-def token():
-    form = NewTokenForm(request.form)
+@admin.route('/new_session', methods=['GET', 'POST'])
+def new_session():
+    form = NewSessionForm(request.form)
     if request.method == 'POST':
         if form.validate():
+            clean_id = clean(form.patient_id.data)
             clean_first = clean(form.first.data).strip().lower()
             clean_last = clean(form.last.data).strip().lower()
-            for single_user in User.query.all():
-                if single_user.first_name == clean_first and \
-                                single_user.last_name == clean_last:
-                    if single_user.token is None:
-                        while True:
-                            new_token = randint(10000, 99999)
-                            collision = User.query\
-                                .filter(User.token == new_token)\
-                                .first()
-                            if collision is None:
-                                break
-                        single_user.token = new_token
-                        db.session.add(single_user)
-                        db.session.commit()
-                        flash(u"This user's token is: {}".format(new_token), 'success')
-                    else:
-                        flash(u"This user already has a token: {}".format(single_user.token), 'success')
-                    return redirect(url_for('admin.token'))
-            flash(u'This user is not in the system. Please check spelling or add user first.', 'error')
-            return redirect(url_for('admin.token'))
-        flash(u'Please fill out entire form', 'error')
-        return redirect(url_for('admin.token'))
-    return render_template('admin/user.html', form=form)
+            clean_date = clean(form.date.data)
+            clean_form_type = clean(form.form_name.data)
+            user = User.query \
+                .filter(User.patient_id == clean_id) \
+                .first()
+            if user is None or user.decrypt_last_name() != clean_last or \
+                            user.decrypt_first_name() != clean_first:
+                flash(u'This user does not exist. Either add them to system or check data', 'error')
+                return redirect(url_for('admin.new_session'))
+            assessment = Form.query \
+                .filter(Form.user_id == user.id,
+                        Form.date == clean_date,
+                        Form.section == 0) \
+                .first()
+            if assessment is not None:
+                flash(u'This patient already has a session scheduled for this day', 'error')
+                return redirect(url_for('admin.new_session'))
+            new_assessment = Form(user_id = user.id, date = clean_date, name=clean_form_type)
+            db.session.add(new_assessment)
+            db.session.commit()
+            flash(u'This patient has a new session scheduled.', 'success')
+            return redirect(url_for('admin.new_session'))
+        else:
+            flash(u'Please fill entire form', 'error')
+            return redirect(url_for('admin.new_session'))
+    return render_template('admin/new_session.html', form=form)
 
 
 @admin.route('/display_form')

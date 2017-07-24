@@ -1,55 +1,80 @@
 from flask import render_template, request, jsonify, session, flash, redirect, url_for, current_app
 from . import main
-from .forms import TokenForm
+from .forms import NewSessionForm, IdentifyAssessmentForm
 from ..models import Form, Question, User
 from .. import db
 from decorators import token_required
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
-from sqlalchemy.sql.expression import desc, asc
+from sqlalchemy.sql.expression import desc, asc, func
 from bleach import clean
 from itertools import zip_longest
+from datetime import datetime
 
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    form = TokenForm(request.form)
+    form = NewSessionForm(request.form)
     if request.method == 'POST':
         if form.validate():
             first_name = clean(form.first_name.data)
             last_name = clean(form.last_name.data)
-            token = clean(form.token.data)
+            patient_id = clean(form.patient_id.data)
             user = User.query\
-                .filter(User.token == token)\
+                .filter(User.patient_id == patient_id)\
                 .first()
-            if user is not None and user.first_name == first_name and \
-                    user.last_name == last_name:
-                current_form = user.form \
-                    .order_by(desc(Form.timestamp)) \
-                    .first()
-                if current_form is None or current_form.section is None:
-                    new_form = Form(user=user)
-                    db.session.add(new_form)
-                    db.session.commit()
+            if user is not None and user.decrypt_first_name() == first_name and \
+                    user.decrypt_last_name() == last_name:
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
-                session['token'] = s.dumps({'auth': clean(form.token.data)})
-                session['name'] = user.first_name + ' ' + user.last_name
-                return redirect(url_for('main.form'))
+                session['token'] = s.dumps({'auth': clean(patient_id)})
+                session['name'] = user.decrypt_first_name() + ' ' + user.decrypt_last_name()
+                return redirect(url_for('main.begin'))
         flash(u'Please check entered data.', 'error')
         return redirect(url_for('main.index'))
     return render_template('main/index.html', form=form)
 
 
+@main.route('/begin', methods=['GET', 'POST'])
+@token_required
+def begin(single_user):
+    form = IdentifyAssessmentForm(request.form)
+    if request.method == 'POST':
+        if form.validate():
+            single_assessment = Form.query.get(int(clean(form.assessment.data)))
+            if single_assessment is None:
+                flash(u'This form is not currently available', 'error')
+                return redirect(url_for('main.begin'))
+            else:
+                session['form'] = single_assessment.id
+                return redirect(url_for('main.form'))
+        else:
+            flash(u'Please check form entry', 'error')
+            return redirect(url_for('main.begin'))
+    else:
+        assessments = Form.query \
+            .filter(Form.user_id == single_user.id,
+                    Form.section != None) \
+            .all()
+        if len(assessments) == 0:
+            session.clear()
+            flash(u'You do not have any assessments to fill out at this time', 'error')
+            return redirect(url_for('main.index'))
+        to_display = sorted([(a.id, datetime.strftime(a.date, '%b %d, %Y')) for a in assessments], key=lambda x: x[1])
+        return render_template('main/begin.html', assessments=to_display, form=form)
+
+
 @main.route('/form')
 @token_required
 def form(single_user):
-    current_form = single_user.form\
-        .order_by(desc(Form.timestamp))\
-        .first()
+    if 'form' not in session:
+        session.clear()
+        flash(u'Your session has expired', 'error')
+        return redirect(url_for('main.index'))
+    current_form = Form.query.get(session['form'])
     if current_form is None:
-        flash(u'There has been an error with your token', 'error')
+        flash(u'There has been an error', 'error')
         return redirect(url_for('main.index'))
     section = current_form.section
-    questions = Form.get_questions()
+    questions = Form.get_questions(current_form.name)
     if section >= len(questions):
         return redirect(url_for('main.finish'))
     buffer = sum([len(questions[s]) for s in range(0,section)])
@@ -59,7 +84,6 @@ def form(single_user):
         .filter(Question.question.in_(question_numbers))\
         .order_by(asc(Question.question))\
         .all()
-    print('loading: ' + str(section))
     return render_template('main/form.html', questions=zip_longest(questions[section], responses),
                            complete=(section+1)*100//len(questions),
                            buffer=buffer,
@@ -70,9 +94,7 @@ def form(single_user):
 @token_required
 def process(single_user):
     data = request.get_json(force=True)
-    current_form = single_user.form\
-        .order_by(desc(Form.timestamp))\
-        .first()
+    current_form = Form.query.get(session['form'])
     if current_form is None:
         return jsonify({'code': '400'})
     for question in data:
@@ -124,13 +146,10 @@ def process(single_user):
 @main.route('/finish')
 @token_required
 def finish(single_user):
-    current_form = single_user.form\
-        .order_by(desc(Form.timestamp))\
-        .first()
+    current_form = Form.query.get(session['form'])
     if current_form is None:
         return jsonify({'code': '400'})
     current_form.section = None
-    single_user.token = None
     db.session.add(current_form)
     db.session.add(single_user)
     db.session.commit()

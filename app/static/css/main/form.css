@@ -26,6 +26,7 @@ footer{
     left: 0;
     width: 100%;
     background-color: #000;
+    z-index: 1000;
 }
 
 .progress{
@@ -39,6 +40,10 @@ body{
 
 .picker-disabled{
     background-color: #eee;
+}
+
+#warning{
+    display: none;
 }
 
 @media
@@ -75,7 +80,7 @@ only screen and (max-width: 1400px){
 
 
     td:nth-of-type(1):before{ content: "Question"}
-    td:nth-of-type(2):before{ content: "Skip"}
+    td:nth-of-type(2):before{ content: "N/A"}
     td:nth-of-type(3):before{ content: "Intensity"}
     td:nth-of-type(4):before{ content: "Frequency"}
     td:nth-of-type(5):before{ content: "Change"}

@@ -8,71 +8,23 @@ from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
 from . import login_manager
 from flask_login import UserMixin
 
+
 class Form(db.Model):
     __tablename__ = 'form'
     id = db.Column(db.INTEGER, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    name = db.Column(db.String)
+    date = db.Column(db.DateTime, index=True)
     user_id = db.Column(db.INTEGER, db.ForeignKey('user.id'))
     section = db.Column(db.INTEGER, default=0, nullable=True)
 
     user = db.relationship('User', backref=backref('form', lazy='dynamic'))
 
     @staticmethod
-    def get_questions():
-        # questions = [['Difficulty paying attention, focusing or concentrating',
-        #                        'Spacey, foggy'],
-        #                        ['On guard, watchful, hypervigilant',
-        #                        'Impulsive, acts without thinking',
-        #                        'Not insightful, unobservant, inattentive'],
-        #                        ['Restless, unable to sit still, fidgety',
-        #                        'Racing thoughts']
-        #                        ]
+    def get_questions(name):
 
-        # questions = [['1', '2'], ['3', '4', '5'], ['6', '7']]
-
-        questions = [['Difficulty paying attention, focusing or concentrating',
-                      'Spacey, foggy',
-                      'On guard, watchful, hypervigilant',
-                      'Impulsive, acts without thinking',
-                      'Not insightful, unobservant, inattentive',
-                      'Restless, unable to sit still, fidgety',
-                      'Racing thoughts'],
-                     ['Anxious, nervous, worried',
-                      'Panic attacks',
-                      'Sad',
-                      'Sensitive, cries easily/often',
-                      'Irritable, agitated or easily provoked',
-                      'Unable to relax',
-                      'Rage, aggression, tantrums, destructiveness',
-                      'Withdrawn, shut-down, numb'],
-                     ['Difficulty falling asleep',
-                      'Difficulty staying asleep',
-                      'Nightmares',
-                      'Feels tired and fatigued after sleeping'],
-                     ['Trouble getting along with peers or fitting in',
-                      'Trouble engaging in activities',
-                      'Trouble making and/or maintaining eye contact',
-                      'Not playful',
-                      'Not cooperative'],
-                     ['Low energy, lack of motivation',
-                      'High energy, seeks stimulation, tireless',
-                      'Talks too fast/much/loud/high pitched',
-                      'Talks to slow/soft or does not talk enough'],
-                     ['Stomachaches',
-                      'Headaches',
-                      'Muscle tension',
-                      'Constipation or diarrhea',
-                      'Dizziness',
-                      'Grinds or clenches teeth',
-                      'Change in appetite (loss or gain)',
-                      'Hands or legs shake, tremors',
-                      'Hypersensitivity to light, touch and sounds',
-                      'Lack of responsiveness to touch, pain and loud sounds',
-                      'Tics',
-                      'Skin crawling sensations',
-                      'Bed Wetting']
-                     ]
-        return questions
+        return {'A': [['A1', 'A2'], ['A3', 'A4', 'A5'], ['A6', 'A7']],
+                'B': [['B1', 'B2', 'B3', 'B4', 'B5']],
+                'C': [['C1', 'C2', 'C3'], ['C4']]}.get(name)
 
     @staticmethod
     def generate_forms(count):
@@ -106,7 +58,7 @@ class Form(db.Model):
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
-        return "Form(user_id={self.user_id})".format(self=self)
+        return "Form(user_id={self.user_id}, date={self.date}, section={self.section})".format(self=self)
 
     def __str__(self):
         return self.__repr__()
@@ -119,7 +71,7 @@ class Question(db.Model):
     question = db.Column(db.INTEGER)
     intensity = db.Column(db.INTEGER, nullable=True)
     frequency = db.Column(db.INTEGER, nullable=True)
-    change = db.Column(db.String, nullable=True)
+    change = db.Column(db.INTEGER, nullable=True)
     notes = db.Column(db.TEXT)
 
     form = db.relationship('Form', backref=backref('question', lazy='dynamic'))
@@ -136,9 +88,37 @@ class Question(db.Model):
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.INTEGER, primary_key=True)
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
-    token = db.Column(db.INTEGER, nullable=True)
+    patient_id = db.Column(db.String, index=True)
+    first_name_encrypt = db.Column(db.LargeBinary)
+    last_name_encrypt = db.Column(db.LargeBinary)
+
+    @property
+    def first_name(self):
+        raise AttributeError('first_name is encrypted')
+
+    @first_name.setter
+    def first_name(self, p):
+        f = Fernet(current_app.config['ENCRYPT_KEY'])
+        self.first_name_encrypt = f.encrypt(p.encode('utf-8'))
+
+    def decrypt_first_name(self):
+        f = Fernet(current_app.config['ENCRYPT_KEY'])
+        return f.decrypt(self.first_name_encrypt).decode('utf-8')
+
+    @property
+    def last_name(self):
+        raise AttributeError('first_name is encrypted')
+
+    @last_name.setter
+    def last_name(self, p):
+        f = Fernet(current_app.config['ENCRYPT_KEY'])
+        if isinstance(p, str):
+            p = p.encode('utf-8')
+        self.last_name_encrypt = f.encrypt(p)
+
+    def decrypt_last_name(self):
+        f = Fernet(current_app.config['ENCRYPT_KEY'])
+        return f.decrypt(self.last_name_encrypt).decode('utf-8')
 
     @staticmethod
     def generate_users(count):
@@ -154,8 +134,8 @@ class User(db.Model):
             add = True
 
             for user in User.query.all():
-                if user.first_name == first and \
-                                user.last_name == last:
+                if user.decrypt_first_name() == first and \
+                                user.decrypt_last_name() == last:
                     add = False
 
             if add is False:

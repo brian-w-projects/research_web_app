@@ -44,11 +44,11 @@
 
 {% macro select_bsw_macro(name, num, response) %}
   <select class="selectpicker show-tick" title='Select' name="{{ num }} {{ name }}">
-    {% for i in ('B','S','W') %}
+    {% for i in ('Worse','Same','Better') %}
       {% if i == response %}
-        <option selected='selected' value="{{ i }}">{{ i }}</option>
+        <option selected='selected' value="{{ loop.index0 }}">{{ i }}</option>
       {% else %}
-        <option value="{{ i }}">{{ i }}</option>
+        <option value="{{ loop.index0 }}">{{ i }}</option>
       {% endif %}
     {% endfor %}
   </select>
@@ -60,10 +60,12 @@
       {% for category, message in messages %}
         {% if category == 'error' %}
           <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign"></span>
             {{ message }}
           </div>
         {% elif category == 'success' %}
           <div class="alert alert-success" role="alert">
+            <span class="glyphicon glyphicon-check"></span>
             {{ message }}
           </div>
         {% endif %}

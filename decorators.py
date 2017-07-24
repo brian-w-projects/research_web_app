@@ -18,10 +18,10 @@ def token_required(f):
             flash(u'Your session has expired.', 'error')
             return redirect(url_for('main.index'))
         single_user = User.query\
-            .filter(User.token == data.get('auth'))\
+            .filter(User.patient_id == data.get('auth'))\
             .first()
         if single_user is None:
-            flash(u'Your token is invalid.', 'error')
+            flash(u'Your session has expired.', 'error')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs, single_user=single_user)
     return decorated_function

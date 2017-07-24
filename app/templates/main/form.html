@@ -35,7 +35,7 @@
                         {% else %}
                           <input name='{{ loop.index + buffer }}' type="checkbox" value="skip"/>
                         {% endif %}
-                        Skip
+                        Not Applicable
                       </label>
                     </td>
                     <td>
@@ -58,6 +58,14 @@
               </tbody>
           </table>
     </form>
+    <div class="container-fluid" id="warning">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign"></span>
+            Please ensure you have answered every question or marked them N/A.
+        </div>
+      </div>
+    </div>
     <ul class="pager">
       {% if buffer != 0 %}
         <li class="previous">

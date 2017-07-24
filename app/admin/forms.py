@@ -1,14 +1,18 @@
 from flask_wtf import FlaskForm
-from wtforms import validators, StringField, SubmitField, SelectField, BooleanField
+from wtforms import validators, StringField, SubmitField, BooleanField, DateField
 
 
-class NewTokenForm(FlaskForm):
-    first = StringField('First', validators=[validators.DataRequired()])
-    last = StringField('Last', validators=[validators.DataRequired()])
+class NewSessionForm(FlaskForm):
+    patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
+    first = StringField('First Name', validators=[validators.DataRequired()])
+    last = StringField('Last Name', validators=[validators.DataRequired()])
+    form_name = StringField('Form Name', validators=[validators.DataRequired()])
+    date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 
 
 class NewUserForm(FlaskForm):
+    patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
     first = StringField('First', validators=[validators.DataRequired()])
     last = StringField('Last', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')

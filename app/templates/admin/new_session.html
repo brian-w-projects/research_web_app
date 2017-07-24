@@ -1,0 +1,71 @@
+{% extends 'abstract/base.html' %}
+
+{% block header %}
+  <title>New Session</title>
+  <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-datepicker.min.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+  {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
+  <div class="container-fluid">
+    <form method="POST">
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            {{ form.patient_id(class='form-control', placeholder='Patient ID') }}
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            {{ form.first(class='form-control', placeholder='First Name') }}
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            {{ form.last(class='form-control', placeholder='Last Name') }}
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            {{ form.date(class='form-control', placeholder='Date', type='text', id='date') }}
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            <select class="selectpicker show-tick" title="Select" name="form_name" id="form_name">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <br/>
+      {{ form.csrf_token() }}
+      <div class="row">
+        <div class="form-group">
+          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+            {{ form.submit(class='form-control', disabled=True) }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin/new_session.js') }}"></script>
+{% endblock %}

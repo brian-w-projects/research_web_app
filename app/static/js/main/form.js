@@ -4,12 +4,13 @@ $(function(){
     var $radios = $(':radio');
     var $radiosContainer = $radios.parent().parent();
     var $selectpicker = $('.selectpicker');
+    var $warning = $('#warning');
     var wide = true;
 
-    $selectpicker.selectpicker('mobile');
 
     if($(document).width() <= 1400){
         $form.find(':radio').parent().parent().remove();
+        $selectpicker.selectpicker('mobile');
         wide = false;
     }else{
         $form.find('.bootstrap-select').remove();
@@ -37,6 +38,7 @@ $(function(){
                     if (!$validate.closest(':checkbox').is(':checked') && !$validate.hasClass('has-success')) {
                         $validate.addClass('has-error').find('span').addClass('glyphicon-warning-sign');
                         toSubmit = false;
+                        $warning.show();
                     }
                 }
             });
@@ -46,6 +48,7 @@ $(function(){
                 if (!$skip.is(':checked')) {
                     if (!$(this).parent().find('button').hasClass('btn-success')) {
                         toSubmit = false;
+                        $warning.show();
                         $(this).selectpicker('setStyle', 'btn-danger', 'add');
                     }
                 }
@@ -53,6 +56,7 @@ $(function(){
         }
 
         if(toSubmit){
+            $warning.hide();
             $(this).button('loading');
             $.ajax({
                 type: 'POST',
