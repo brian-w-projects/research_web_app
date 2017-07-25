@@ -5,15 +5,20 @@ from ..models import Form, Question, User, Researcher
 from .. import db
 from random import randint
 from bleach import clean
+from flask_login import login_required, current_user
 
 
 @admin.route('/')
+@login_required
 def index():
-    return redirect(url_for('admin.user'))
+    return render_template('admin/index.html')
 
 
 @admin.route('/new_researcher', methods=['GET', 'POST'])
+@login_required
 def new_researcher():
+    if not current_user.is_master():
+        abort(403)
     form = NewResearcherForm(request.form)
     if request.method == 'POST':
         if form.validate():
@@ -42,11 +47,17 @@ def new_researcher():
         else:
             flash(u'Error on form inputs', 'error')
             return redirect(url_for('admin.new_researcher'))
-    return render_template('admin/new_researcher.html', form=form)
+    display = Researcher.query \
+        .filter(Researcher.token != None) \
+        .all()
+    return render_template('admin/new_researcher.html', form=form, display=display)
 
 
 @admin.route('/remove_researcher', methods=['GET', 'POST'])
+@login_required
 def remove_researcher():
+    if not current_user.is_master():
+        abort(403)
     form = RemoveResearcherForm(request.form)
     if request.method == 'POST':
         if form.validate():
@@ -56,8 +67,8 @@ def remove_researcher():
                     .first()
             if r is None:
                 flash(u'This email is not registered in this system', 'error')
-            elif r.role == 'ainat':
-                flash(u'Ainat cannot be removed from this system', 'error')
+            elif r.is_master():
+                flash(u'This user cannot be removed from this system', 'error')
             else:
                 db.session.delete(r)
                 db.session.commit()
@@ -66,10 +77,12 @@ def remove_researcher():
         else:
             flash(u'Error on form inputs', 'error')
             return redirect(url_for('admin.remove_researcher'))
-    return render_template('admin/remove_researcher.html', form=form)
+    display = Researcher.query.order_by(Researcher.last_name).all()
+    return render_template('admin/remove_researcher.html', form=form, display=display)
 
 
 @admin.route('/user', methods=['GET', 'POST'])
+@login_required
 def user():
     form = NewUserForm(request.form)
     if request.method == 'POST':
@@ -95,6 +108,7 @@ def user():
 
 
 @admin.route('/new_session', methods=['GET', 'POST'])
+@login_required
 def new_session():
     form = NewSessionForm(request.form)
     if request.method == 'POST':
@@ -128,37 +142,3 @@ def new_session():
             flash(u'Please fill entire form', 'error')
             return redirect(url_for('admin.new_session'))
     return render_template('admin/new_session.html', form=form)
-
-
-@admin.route('/display_form')
-def display_form():
-    # id = int(request.args.get('id'))
-    id = 1
-    form = Form.query.get(id)
-    if form is None:
-        abort(400)
-    responses = form.question\
-        .order_by(Question.id)\
-        .all()
-    questions = [ele for sub in Form.get_questions() for ele in sub]
-    to_display = zip(questions, responses)
-    return render_template('admin/display_form.html', to_display=to_display, id=id)
-
-
-@admin.route('/compare_forms')
-def compare_forms():
-    id1 = 1
-    id2 = 20
-    form1 = Form.query.get(id1)
-    form2 = Form.query.get(id2)
-    if form1 is None or form2 is None:
-        abort(400)
-    responses1 = form1.question\
-        .order_by(Question.id)\
-        .all()
-    responses2 = form2.question\
-        .order_by(Question.id)\
-        .all()
-    questions = [ele for sub in Form.get_questions() for ele in sub]
-    to_display = zip(questions, responses1, responses2)
-    return render_template('admin/display_form.html', to_display=to_display, id=id)

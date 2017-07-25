@@ -25,5 +25,4 @@ class NewResearcherForm(FlaskForm):
 
 class RemoveResearcherForm(FlaskForm):
     email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
-    confirm = BooleanField('Confirm: ', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')

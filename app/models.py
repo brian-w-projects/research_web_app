@@ -161,7 +161,6 @@ class Researcher(UserMixin, db.Model):
     role = db.Column(db.String, default='admin')
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
-    confirmed = db.Column(db.BOOLEAN, default=False)
     token = db.Column(db.INTEGER, nullable=True)
 
     @property
@@ -175,30 +174,32 @@ class Researcher(UserMixin, db.Model):
     def verify_password(self, p):
         return check_password_hash(self.password_hash, p)
 
-    def generate_confirmation_token(self, expiration=3600):
-        s = TimedSerializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.id})
-
-    def confirm(self, token):
-        s = TimedSerializer(current_app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token)
-        except:
-            return False
-        if data.get('confirm') != self.id:
-            return False
-        self.confirmed = True
-        db.session.commit(self)
-        db.session.commit()
-        return True
-
     def is_master(self):
         return self.role == 'master'
 
     def __repr__(self):
-        return "Researcher(email={self.email}, first_name={self.first_name}, last_name={self.last_name}".format(self=self)
+        return "Researcher(email={self.email}, first_name={self.first_name}, last_name={self.last_name})".format(self=self)
 
+    @staticmethod
+    def generate_researchers(count):
+        import forgery_py
+        from random import randint
+
+        print('Generating researchers')
+        for i in range(count):
+            if i % 100 == 0:
+                print('{} of {}'.format(str(i), str(count)))
+            first = forgery_py.name.first_name().strip().lower()
+            last = forgery_py.name.last_name().strip().lower()
+            email = forgery_py.internet.email_address()
+            password = forgery_py.address.city()
+            role = 'admin' if randint(0,20) != 19 else 'master'
+            r = Researcher(first_name=first, last_name=last, email=email, password=password,
+                           role=role)
+            db.session.add(r)
+            db.session.commit()
+        print('{} of {}'.format(str(count), str(count)))
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Researcher.query.get(int(user_id))

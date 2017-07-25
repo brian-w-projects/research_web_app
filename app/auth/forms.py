@@ -12,3 +12,15 @@ class RegisterForm(FlaskForm):
                                                        validators.Length(min=10)])
     password_confirm = PasswordField('Confirm: ', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
+
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    password = PasswordField('Password ', validators=[validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class TokenForm(FlaskForm):
+    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    token = StringField('Token', validators=[validators.DataRequired()])
+    submit = SubmitField('Submit')

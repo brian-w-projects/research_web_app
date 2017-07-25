@@ -1,0 +1,34 @@
+{% extends 'abstract/base.html' %}
+
+{% block content %}
+  <div class="container-fluid">
+    <h2>Hello {{ current_user.first_name|title }} {{ current_user.last_name|title }}</h2>
+    <nav role="navigation">
+      <ul class="nav nav-pills nav-justified">
+        <li role="presentation" {% if request.path == url_for('admin.index') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.index') }}">Home</a>
+        </li>
+        <li role="presentation" {% if request.path == url_for('admin.user') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.user') }}">New Patient</a>
+        </li>
+        <li role="presentation" {% if request.path == url_for('admin.new_session') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.new_session') }}">New Session</a>
+        </li>
+        <li role="presentation">
+          <a href="#">Retrieve Data</a>
+        </li>
+        {% if current_user.is_master() %}
+          <li role="presentation" {% if request.path == url_for('admin.new_researcher') %}class="active"{% endif %}>
+            <a href="{{ url_for('admin.new_researcher') }}">Add Researcher</a>
+          </li>
+          <li role="presentation" {% if request.path == url_for('admin.remove_researcher') %}class="active"{% endif %}>
+            <a href="{{ url_for('admin.remove_researcher') }}">Remove Researcher</a>
+          </li>
+        {% endif %}
+        <li role="presentation"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+  <br/>
+  <br/>
+{% endblock %}

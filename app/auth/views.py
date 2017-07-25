@@ -1,40 +1,97 @@
 from flask import render_template, request, flash, redirect, url_for, abort, current_app
-from flask_login import current_user
+from flask_login import current_user, login_user, logout_user, login_required
 from . import auth
-from .forms import RegisterForm
+from .forms import RegisterForm, LoginForm, TokenForm
 from ..models import Form, Question, User, Researcher
 from .. import db
 from bleach import clean
 
-# START WORKING HERE
-@auth.route('/<int:token>', methods=['GET', 'POST'])
-def register(token):
+
+@auth.route('/token', methods=['GET', 'POST'])
+def token():
+    form = TokenForm(request.form)
+    if request.method == 'POST':
+        if form.validate():
+            try:
+                clean_token = int(clean(form.token.data))
+            except:
+                flash(u'Please check form', 'error')
+                return redirect(url_for('auth.token'))
+            r = Researcher.query \
+                .filter(Researcher.email == clean(form.email.data),
+                        Researcher.token == clean_token) \
+                .first()
+            if r is None:
+                flash(u'Please check form', 'error')
+                return redirect(url_for('auth.token'))
+            flash(u'Please complete registration', 'success')
+            return redirect(url_for('auth.register', token=clean_token))
+        else:
+            flash(u'Please check form', 'error')
+            return redirect(url_for('auth.token'))
+    return render_template('auth/token.html', form=form)
+
+
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.referrer != url_for('auth.token', _external=True):
+        abort(403)
+    if 'token' in request.args:
+        token = request.args.get('token')
+    else:
+        abort(403)
     r = Researcher.query\
-        .filter(Researcher.token == token)\
+        .filter(Researcher.token == int(clean(token)))\
         .first()
     if r is None:
-        abort(404)
+        abort(403)
     form = RegisterForm(request.form)
     if request.method == 'POST':
         if form.validate():
             r.password = clean(form.password.data)
             r.first_name = clean(form.first_name.data.strip().lower())
             r.last_name = clean(form.last_name.data.strip().lower())
-            r.confirmed = True
             r.token = None
             db.session.add(r)
             db.session.commit()
+            flash(u'You have successfully registered', 'success')
+            login_user(r)
+            return redirect(url_for('auth.login'))
         else:
             flash(u'Check form inputs', 'error')
-            return redirect(url_for('register', token=token))
+            return redirect(url_for('admin.register', token=token))
     form.token.data = token
     form.email.data = r.email
     return render_template('auth/register.html', form=form)
 
 
-@auth.before_app_request
-def before_request():
-    if current_user.is_authenticated and not current_user.confirmed \
-            and not request.endpoint.startswith(('auth', 'main')) \
-            and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm(request.form)
+    if request.method == 'POST':
+        if form.validate():
+            check_user = Researcher.query\
+                .filter(Researcher.email == clean(form.email.data),
+                        Researcher.token == None)\
+                .first()
+            if check_user is None:
+                flash(u'Invalid Information', 'error')
+                return redirect(url_for('auth.login'))
+            if check_user.verify_password(clean(form.password.data)):
+                login_user(check_user)
+                return redirect(url_for('admin.index'))
+            else:
+                flash(u'Invalid Information', 'error')
+                return redirect(url_for('auth.login'))
+        else:
+            flash(u'Invalid Information', 'error')
+            return redirect(url_for('auth.login'))
+    return render_template('auth/login.html', form=form)
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash(u'Successfully logged out', 'success')
+    return redirect(url_for('auth.login'))

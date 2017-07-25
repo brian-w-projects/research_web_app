@@ -1,24 +1,26 @@
-{% extends 'abstract/base.html' %}
+{% extends 'abstract/admin_base.html' %}
 
 {% block header %}
   <title>Remove Researcher</title>
 {% endblock %}
 
 {% block content %}
+  {{ super() }}
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
+    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
+      <h2>Remove Researcher Form</h2>
+    </div>
+    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
+      <h3>Use this form to remove a researcher.</h3>
+      <h3 class="btn-danger">This researcher will no longer have access to the patient database!</h3>
+    </div>
     <form method="POST">
       <div class="form-group">
         <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback">
           <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
           {{ form.email(class='form-control', placeholder='Email') }}
           <span class="glyphicon form-control-feedback"></span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-1 input-group input-group-sm has-feedback">
-          {{ form.confirm.label }}
-          {{ form.confirm(class='form-control', type='checkbox') }}
         </div>
       </div>
       {{ form.csrf_token() }}
@@ -28,6 +30,34 @@
         </div>
       </div>
     </form>
+  </div>
+  <br/>
+  <br/>
+  <div class="container-fluid">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Master</th>
+          <th>Confirmed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in display %}
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.email }}</td>
+            <td>{{ r.first_name }}</td>
+            <td>{{ r.last_name }}</td>
+            <td {% if r.role == 'master' %}class="btn-warning"{% endif %}>{{ r.role == 'master' }}</td>
+            <td {% if r.token != none %}class="btn-danger"{% endif %}>{{ r.token == none }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 {% endblock %}
 

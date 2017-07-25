@@ -1,4 +1,4 @@
-{% extends 'abstract/base.html' %}
+{% extends 'abstract/admin_base.html' %}
 
 {% block header %}
   <title>New Session</title>
@@ -6,8 +6,15 @@
 {% endblock %}
 
 {% block content %}
+  {{ super() }}
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
+    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
+      <h2>New Assessment Form</h2>
+    </div>
+    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
+      <h3>Use this form to add a new assessment for a patient.</h3>
+    </div>
     <form method="POST">
       <div class="row">
         <div class="form-group">
@@ -44,7 +51,7 @@
       <div class="row">
         <div class="form-group">
           <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            <select class="selectpicker show-tick" title="Select" name="form_name" id="form_name">
+            <select class="selectpicker show-tick" title="Assessment" name="form_name" id="form_name">
               <option value="A">A</option>
               <option value="B">B</option>
               <option value="C">C</option>

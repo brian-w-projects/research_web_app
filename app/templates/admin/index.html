@@ -1,0 +1,14 @@
+{% extends 'abstract/admin_base.html' %}
+
+{% block header %}
+  <title>Admin Home</title>
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container-fluid">
+    <h2>Welcome {{ current_user.first_name|title }} {{ current_user.last_name|title }}</h2>
+    <h3>Select the action you would like to take above</h3>
+    <h3>Be sure to log out when you are finished</h3>
+  </div>
+{% endblock %}

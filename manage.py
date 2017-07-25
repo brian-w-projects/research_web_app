@@ -4,7 +4,7 @@ import os
 from flask import request
 
 from app import create_app, db
-from app.models import User, Form, Question
+from app.models import User, Form, Question, Researcher
 
 app = create_app(os.environ.get('CONFIG') or 'development')
 
@@ -27,6 +27,15 @@ def hashed_static_file(endpoint, values):
 if __name__ == '__main__':
 
     # with app.app_context():
+    #     r = Researcher(role='admin', email='error@error.com', password='asdfasdfasdf', first_name='error',
+    #                    last_name='error', token=38492)
+    #     db.session.add(r)
+    #     db.session.commit()
+    #     Researcher.generate_researchers(100)
+    #     r = Researcher(role='master', email='p@p.com', password='asdfasdfasdf', first_name='master',
+    #                    last_name='blaster', token=None)
+    #     db.session.add(r)
+    #     db.session.commit()
     #     db.drop_all()
     #     db.create_all()
         # User.generate_users(100)
