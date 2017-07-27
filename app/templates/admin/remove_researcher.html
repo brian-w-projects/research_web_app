@@ -8,12 +8,18 @@
   {{ super() }}
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
-    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
-      <h2>Remove Researcher Form</h2>
-    </div>
-    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
-      <h3>Use this form to remove a researcher.</h3>
-      <h3 class="btn-danger">This researcher will no longer have access to the patient database!</h3>
+    <div class="col-xs-offset-1 col-xs-10" id="supplement">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">Remove Researcher Form</h1>
+        </div>
+        <div class="panel-body">
+          <p>Use this form to remove a researcher.</p>
+        </div>
+        <div class="alert alert-danger">
+          WARNING: This researcher will no longer have access to the patient database!
+        </div>
+      </div>
     </div>
     <form method="POST">
       <div class="form-group">
@@ -34,6 +40,11 @@
   <br/>
   <br/>
   <div class="container-fluid">
+    <div class="col-xs-offset-1 col-xs-10">
+      <div class="alert alert-info">
+        Below are all the researchers that have access to the patient database.
+      </div>
+    </div>
     <table class="table table-bordered table-striped">
       <thead>
         <tr>

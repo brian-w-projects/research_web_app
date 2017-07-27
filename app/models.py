@@ -14,7 +14,7 @@ class Form(db.Model):
     id = db.Column(db.INTEGER, primary_key=True)
     name = db.Column(db.String)
     date = db.Column(db.DateTime, index=True)
-    user_id = db.Column(db.INTEGER, db.ForeignKey('user.id'))
+    patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'))
     section = db.Column(db.INTEGER, default=0, nullable=True)
 
     user = db.relationship('User', backref=backref('form', lazy='dynamic'))
@@ -42,14 +42,15 @@ class Form(db.Model):
             u = User.query\
                 .offset(randint(0, user_count-1))\
                 .first()
-            f = Form(user_id=u.id, section=None,
-                     timestamp=form_date)
+            name = choice(['A', 'B', 'C'])
+            f = Form(patient_id=u.patient_id, section=None,
+                     date=form_date, name=name)
             db.session.add(f)
-            for j in range(1,8):
+            for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
                 q = Question(form=f, question=j,
                              intensity=randint(0,4), frequency=randint(0,4),
-                             change=choice('BSW'),
-                             notes=forgery_py.lorem_ipsum.sentences(randint(1,3)) if randint(1,5) == 2 else '')
+                             change=randint(0,2),
+                             notes=forgery_py.lorem_ipsum.sentences(randint(1,3)).replace(',','-').replace(';','-') if randint(1,5) == 2 else '')
                 db.session.add(q)
             db.session.commit()
             form_date = form_date + timedelta(days=randint(1, 5))
@@ -58,7 +59,7 @@ class Form(db.Model):
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
-        return "Form(user_id={self.user_id}, date={self.date}, section={self.section})".format(self=self)
+        return "Form(id={self.id}, patient_id={self.patient_id}, date={self.date}, section={self.section}, name={self.name})".format(self=self)
 
     def __str__(self):
         return self.__repr__()
@@ -88,7 +89,7 @@ class Question(db.Model):
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.INTEGER, primary_key=True)
-    patient_id = db.Column(db.String, index=True)
+    patient_id = db.Column(db.String, index=True, unique=True)
     first_name_encrypt = db.Column(db.LargeBinary)
     last_name_encrypt = db.Column(db.LargeBinary)
 

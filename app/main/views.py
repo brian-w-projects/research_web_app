@@ -51,14 +51,15 @@ def begin(single_user):
             return redirect(url_for('main.begin'))
     else:
         assessments = Form.query \
-            .filter(Form.user_id == single_user.id,
+            .filter(Form.patient_id == single_user.patient_id,
                     Form.section != None) \
+            .order_by(desc(Form.date)) \
             .all()
         if len(assessments) == 0:
             session.clear()
             flash(u'You do not have any assessments to fill out at this time', 'error')
             return redirect(url_for('main.index'))
-        to_display = sorted([(a.id, datetime.strftime(a.date, '%b %d, %Y')) for a in assessments], key=lambda x: x[1])
+        to_display = [(a.id, datetime.strftime(a.date, '%b %d, %Y')) for a in assessments]
         return render_template('main/begin.html', assessments=to_display, form=form)
 
 
@@ -136,7 +137,7 @@ def process(single_user):
                     update_question.intensity = clean(data[question]['i'])
                     update_question.frequency = clean(data[question]['f'])
                     update_question.change = clean(data[question]['c'])
-                    update_question.notes = clean(data[question]['n'])
+                    update_question.notes = clean(data[question]['n'].replace(',','-').replace(';','-'))
                     db.session.add(update_question)
     db.session.add(current_form)
     db.session.commit()

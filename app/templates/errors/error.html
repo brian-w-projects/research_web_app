@@ -1,0 +1,16 @@
+{% extends 'abstract/base.html' %}
+
+{% block header %}
+  <title>Error</title>
+{% endblock %}
+
+{% block content %}
+  {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
+  <div class="container-fluid">
+    <div class="alert alert-danger" role="alert">
+      <p>Sorry, an error has occurred!</p>
+      <p>If you are a patient <a href="{{ url_for('main.index') }}">Click Here</a></p>
+      <p>If you are a researcher <a href="{{ url_for('admin.index') }}">Click Here</a></p>
+    </div>
+  </div>
+{% endblock %}

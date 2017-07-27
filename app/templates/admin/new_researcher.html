@@ -8,12 +8,18 @@
   {{ super() }}
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
-    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
-      <h2>New Researcher Form</h2>
-    </div>
-    <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-3">
-      <h3>Use this form to add a new researcher.</h3>
-      <h3 class="btn-danger">This person will have full access to the patient database!</h3>
+    <div class="col-xs-offset-1 col-xs-10" id="supplement">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">New Researcher Form</h1>
+        </div>
+        <div class="panel-body">
+          <p>Use this form to add a new researcher.</p>
+        </div>
+        <div class="alert alert-danger">
+          WARNING: This person will have full access to the patient database!
+        </div>
+      </div>
     </div>
     <form method="POST">
       <div class="form-group">
@@ -33,32 +39,39 @@
   </div>
   <br/>
   <br/>
-  <div class="container-fluid">
-    <table class="table table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Email</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Master</th>
-          <th>Token</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in display %}
+  {% if display %}
+    <div class="col-xs-offset-1 col-xs-10">
+      <div class="alert alert-danger">
+        WARNING: The following researchers have not confirmed their accounts.
+      </div>
+    </div>
+    <div class="container-fluid">
+      <table class="table table-bordered table-striped">
+        <thead>
           <tr>
-            <td>{{ r.id }}</td>
-            <td>{{ r.email }}</td>
-            <td>{{ r.first_name }}</td>
-            <td>{{ r.last_name }}</td>
-            <td {% if r.role == 'master' %}class="btn-warning"{% endif %}>{{ r.role == 'master' }}</td>
-            <td {% if r.token != none %}class="btn-danger"{% endif %}>{{ r.token }}</td>
+            <th>ID</th>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Master</th>
+            <th>Token</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {% for r in display %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.first_name }}</td>
+              <td>{{ r.last_name }}</td>
+              <td {% if r.role == 'master' %}class="btn-warning"{% endif %}>{{ r.role == 'master' }}</td>
+              <td {% if r.token != none %}class="btn-danger"{% endif %}>{{ r.token }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block scripts %}

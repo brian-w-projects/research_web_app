@@ -126,14 +126,14 @@ def new_session():
                 flash(u'This user does not exist. Either add them to system or check data', 'error')
                 return redirect(url_for('admin.new_session'))
             assessment = Form.query \
-                .filter(Form.user_id == user.id,
+                .filter(Form.patient_id == user.patient_id,
                         Form.date == clean_date,
                         Form.section == 0) \
                 .first()
             if assessment is not None:
                 flash(u'This patient already has a session scheduled for this day', 'error')
                 return redirect(url_for('admin.new_session'))
-            new_assessment = Form(user_id = user.id, date = clean_date, name=clean_form_type)
+            new_assessment = Form(patient_id = user.patient_id, date = clean_date, name=clean_form_type)
             db.session.add(new_assessment)
             db.session.commit()
             flash(u'This patient has a new session scheduled.', 'success')

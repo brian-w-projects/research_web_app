@@ -34,11 +34,11 @@ def token():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.referrer != url_for('auth.token', _external=True):
-        abort(403)
     if 'token' in request.args:
         token = request.args.get('token')
     else:
+        abort(403)
+    if request.referrer != url_for('auth.token', _external=True) and request.referrer != url_for('auth.register', token=request.args.get('token'), _external=True):
         abort(403)
     r = Researcher.query\
         .filter(Researcher.token == int(clean(token)))\
@@ -55,7 +55,6 @@ def register():
             db.session.add(r)
             db.session.commit()
             flash(u'You have successfully registered', 'success')
-            login_user(r)
             return redirect(url_for('auth.login'))
         else:
             flash(u'Check form inputs', 'error')
@@ -79,7 +78,7 @@ def login():
                 return redirect(url_for('auth.login'))
             if check_user.verify_password(clean(form.password.data)):
                 login_user(check_user)
-                return redirect(url_for('admin.index'))
+                return redirect(request.args.get('next') or url_for('admin.index'))
             else:
                 flash(u'Invalid Information', 'error')
                 return redirect(url_for('auth.login'))

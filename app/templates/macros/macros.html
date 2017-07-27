@@ -18,10 +18,10 @@
   <div class="radio input-lg has-feedback">
     {% for i in ('B','S','W') %}
       <label class="radio-inline">
-        {% if i == response %}
-          <input type="radio" name="{{ num }} {{ name }}" value="{{ i }}" checked/>
+        {% if loop.index0 == response %}
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ loop.index0 }}" checked/>
         {% else %}
-          <input type="radio" name="{{ num }} {{ name }}" value="{{ i }}"/>
+          <input type="radio" name="{{ num }} {{ name }}" value="{{ loop.index0 }}"/>
         {% endif %}
         {{ i }}
       </label>
@@ -45,7 +45,7 @@
 {% macro select_bsw_macro(name, num, response) %}
   <select class="selectpicker show-tick" title='Select' name="{{ num }} {{ name }}">
     {% for i in ('Worse','Same','Better') %}
-      {% if i == response %}
+      {% if loop.index0 == response %}
         <option selected='selected' value="{{ loop.index0 }}">{{ i }}</option>
       {% else %}
         <option value="{{ loop.index0 }}">{{ i }}</option>

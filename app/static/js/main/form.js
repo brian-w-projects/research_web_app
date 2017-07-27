@@ -13,7 +13,7 @@ $(function(){
         $selectpicker.selectpicker('mobile');
         wide = false;
     }else{
-        $form.find('.bootstrap-select').remove();
+        $form.find('.selectpicker').remove();
         wide = true;
     }
 

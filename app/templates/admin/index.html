@@ -7,8 +7,18 @@
 {% block content %}
   {{ super() }}
   <div class="container-fluid">
-    <h2>Welcome {{ current_user.first_name|title }} {{ current_user.last_name|title }}</h2>
-    <h3>Select the action you would like to take above</h3>
-    <h3>Be sure to log out when you are finished</h3>
+    <div class="col-xs-offset-1 col-xs-10" id="supplement">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">Welcome {{ current_user.first_name|title }} {{ current_user.last_name|title }}</h1>
+        </div>
+        <div class="panel-body">
+          <ul>
+            <li>Select the action you would like to take above</li>
+            <li>Be sure to log out when you are finished</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}

@@ -27,23 +27,18 @@ def hashed_static_file(endpoint, values):
 if __name__ == '__main__':
 
     # with app.app_context():
-    #     r = Researcher(role='admin', email='error@error.com', password='asdfasdfasdf', first_name='error',
-    #                    last_name='error', token=38492)
-    #     db.session.add(r)
-    #     db.session.commit()
-    #     Researcher.generate_researchers(100)
+    #     db.drop_all()
+    #     db.create_all()
+    #
     #     r = Researcher(role='master', email='p@p.com', password='asdfasdfasdf', first_name='master',
     #                    last_name='blaster', token=None)
     #     db.session.add(r)
+    #     u = User(patient_id='111', first_name='bob', last_name='bob')
+    #     db.session.add(u)
     #     db.session.commit()
-    #     db.drop_all()
-    #     db.create_all()
-        # User.generate_users(100)
-        # u = User(first_name='bob', last_name='bob')
-        # db.session.add(u)
-        # db.session.commit()
-
-        # Form.generate_forms(300)
+    #     Form.generate_forms(100)
+    # Researcher.generate_researchers(100)
+    # User.generate_users(10)
 
 
     app.run(port=5000)
