@@ -5,7 +5,7 @@ from ..models import Form, Question, User
 from .. import db
 from decorators import token_required
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
-from sqlalchemy.sql.expression import desc, asc, func
+from sqlalchemy.sql.expression import desc, asc
 from bleach import clean
 from itertools import zip_longest
 from datetime import datetime
@@ -26,7 +26,7 @@ def index():
                     user.decrypt_last_name() == last_name:
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
                 session['token'] = s.dumps({'auth': clean(patient_id)})
-                session['name'] = user.decrypt_first_name() + ' ' + user.decrypt_last_name()
+                session['name'] = first_name + ' ' + last_name
                 return redirect(url_for('main.begin'))
         flash(u'Please check entered data.', 'error')
         return redirect(url_for('main.index'))
@@ -95,6 +95,10 @@ def form(single_user):
 @token_required
 def process(single_user):
     data = request.get_json(force=True)
+    if 'form' not in session:
+        session.clear()
+        flash(u'Your session has expired', 'error')
+        return redirect(url_for('main.index'))
     current_form = Form.query.get(session['form'])
     if current_form is None:
         return jsonify({'code': '400'})
@@ -147,6 +151,10 @@ def process(single_user):
 @main.route('/finish')
 @token_required
 def finish(single_user):
+    if 'form' not in session:
+        session.clear()
+        flash(u'There has been an error', 'error')
+        return redirect(url_for('main.index'))
     current_form = Form.query.get(session['form'])
     if current_form is None:
         return jsonify({'code': '400'})

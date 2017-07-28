@@ -1,12 +1,9 @@
 from flask import render_template, request, flash, redirect, url_for, abort, current_app, send_file, Response
 from . import data
 from .forms import SingleDataForm
-from ..models import Form, Question, User, Researcher
-from .. import db
-from random import randint
+from ..models import Form
 from bleach import clean
-import openpyxl
-from flask_login import login_required, current_user
+from flask_login import login_required
 from datetime import datetime, timedelta
 from sqlalchemy.sql.expression import or_, desc
 
@@ -22,7 +19,6 @@ def index():
         form_type = clean(form.form_type.data)
         if form.validate():
             form_process = get_forms(get_date_reference(dates), initial, form_type, id)
-
             if len(form_process) == 0:
                 flash(u'No data from this search', 'error')
                 return redirect(url_for('data.index'))

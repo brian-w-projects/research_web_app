@@ -9,7 +9,7 @@
   {{ super() }}
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
-    <div class="col-xs-offset-1 col-xs-10" id="supplement">
+    <div class="col-xs-offset-1 col-xs-10">
       <div class="panel panel-primary">
         <div class="panel-heading">
           <h1 class="panel-title">New Assessment Form</h1>
@@ -21,55 +21,39 @@
     </div>
     <form method="POST">
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            {{ form.patient_id(class='form-control', placeholder='Patient ID') }}
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.patient_id(class='form-control', placeholder='Patient ID') }}
         </div>
       </div>
       <br/>
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            {{ form.first(class='form-control', placeholder='First Name') }}
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.first(class='form-control', placeholder='First Name') }}
         </div>
       </div>
       <br/>
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            {{ form.last(class='form-control', placeholder='Last Name') }}
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.last(class='form-control', placeholder='Last Name') }}
         </div>
       </div>
       <br/>
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            {{ form.date(class='form-control', placeholder='Date', type='text', id='date') }}
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.date(class='form-control', placeholder='Date', type='text', id='date') }}
         </div>
       </div>
       <br/>
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            <select class="selectpicker show-tick" title="Assessment" name="form_name" id="form_name">
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-            </select>
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.form_name(class='selectpicker show-tick', title='Assessment') }}
         </div>
       </div>
       <br/>
       {{ form.csrf_token() }}
       <div class="row">
-        <div class="form-group">
-          <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-            {{ form.submit(class='form-control', disabled=True) }}
-          </div>
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.submit(class='form-control', disabled=True) }}
         </div>
       </div>
     </form>

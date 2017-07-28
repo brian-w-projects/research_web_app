@@ -1,11 +1,12 @@
-from flask import render_template, request, flash, redirect, url_for, abort, current_app
+from flask import render_template, request, flash, redirect, url_for, abort
 from . import admin
 from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm
-from ..models import Form, Question, User, Researcher
+from ..models import Form, User, Researcher
 from .. import db
 from random import randint
 from bleach import clean
 from flask_login import login_required, current_user
+from decorators import master_required
 
 
 @admin.route('/')
@@ -16,9 +17,8 @@ def index():
 
 @admin.route('/new_researcher', methods=['GET', 'POST'])
 @login_required
+@master_required
 def new_researcher():
-    if not current_user.is_master():
-        abort(403)
     form = NewResearcherForm(request.form)
     if request.method == 'POST':
         if form.validate():
@@ -55,9 +55,8 @@ def new_researcher():
 
 @admin.route('/remove_researcher', methods=['GET', 'POST'])
 @login_required
+@master_required
 def remove_researcher():
-    if not current_user.is_master():
-        abort(403)
     form = RemoveResearcherForm(request.form)
     if request.method == 'POST':
         if form.validate():
@@ -77,11 +76,13 @@ def remove_researcher():
         else:
             flash(u'Error on form inputs', 'error')
             return redirect(url_for('admin.remove_researcher'))
-    display = Researcher.query.order_by(Researcher.last_name).all()
+    display = Researcher.query \
+        .order_by(Researcher.last_name) \
+        .all()
     return render_template('admin/remove_researcher.html', form=form, display=display)
 
 
-@admin.route('/user', methods=['GET', 'POST'])
+@admin.route('/new_patient', methods=['GET', 'POST'])
 @login_required
 def user():
     form = NewUserForm(request.form)
@@ -96,7 +97,6 @@ def user():
             if user is not None:
                 flash(u'A patient with this ID has already been registered', 'error')
                 return redirect(url_for('admin.user'))
-
             to_add = User(first_name=clean_first, last_name=clean_last, patient_id = clean_id)
             db.session.add(to_add)
             db.session.commit()
@@ -127,8 +127,7 @@ def new_session():
                 return redirect(url_for('admin.new_session'))
             assessment = Form.query \
                 .filter(Form.patient_id == user.patient_id,
-                        Form.date == clean_date,
-                        Form.section == 0) \
+                        Form.date == clean_date) \
                 .first()
             if assessment is not None:
                 flash(u'This patient already has a session scheduled for this day', 'error')

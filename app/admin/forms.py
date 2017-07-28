@@ -1,13 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import validators, StringField, SubmitField, BooleanField, DateField
+from wtforms import validators, StringField, SubmitField, DateField, SelectField
 
 
 class NewSessionForm(FlaskForm):
     patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
     first = StringField('First Name', validators=[validators.DataRequired()])
     last = StringField('Last Name', validators=[validators.DataRequired()])
-    form_name = StringField('Form Name', validators=[validators.DataRequired()])
     date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
+    form_name = SelectField('Select Data', choices=[('A', 'A'), ('B', 'B'), ('C', 'C')],
+                               validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 
 

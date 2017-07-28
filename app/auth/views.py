@@ -1,8 +1,8 @@
-from flask import render_template, request, flash, redirect, url_for, abort, current_app
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import render_template, request, flash, redirect, url_for, abort
+from flask_login import login_user, logout_user, login_required
 from . import auth
 from .forms import RegisterForm, LoginForm, TokenForm
-from ..models import Form, Question, User, Researcher
+from ..models import Researcher
 from .. import db
 from bleach import clean
 
@@ -12,11 +12,7 @@ def token():
     form = TokenForm(request.form)
     if request.method == 'POST':
         if form.validate():
-            try:
-                clean_token = int(clean(form.token.data))
-            except:
-                flash(u'Please check form', 'error')
-                return redirect(url_for('auth.token'))
+            clean_token = clean(form.token.data)
             r = Researcher.query \
                 .filter(Researcher.email == clean(form.email.data),
                         Researcher.token == clean_token) \
@@ -34,14 +30,12 @@ def token():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'token' in request.args:
-        token = request.args.get('token')
-    else:
+    if 'token' not in request.args or (request.referrer != url_for('auth.token', _external=True) and
+                    request.referrer != url_for('auth.register', token=request.args.get('token'), _external=True)):
         abort(403)
-    if request.referrer != url_for('auth.token', _external=True) and request.referrer != url_for('auth.register', token=request.args.get('token'), _external=True):
-        abort(403)
+    token = request.args.get('token')
     r = Researcher.query\
-        .filter(Researcher.token == int(clean(token)))\
+        .filter(Researcher.token == clean(token))\
         .first()
     if r is None:
         abort(403)
@@ -74,7 +68,7 @@ def login():
                         Researcher.token == None)\
                 .first()
             if check_user is None:
-                flash(u'Invalid Information', 'error')
+                flash(u'Invalid Information. Do you need to register?', 'error')
                 return redirect(url_for('auth.login'))
             if check_user.verify_password(clean(form.password.data)):
                 login_user(check_user)
