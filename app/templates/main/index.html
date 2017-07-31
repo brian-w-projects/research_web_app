@@ -8,33 +8,11 @@
   {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
   <div class="container-fluid">
     <form method="POST">
-      <div class="row">
-        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-          {{ form.patient_id(class="form-control", placeholder="Patient ID") }}
-        </div>
-      </div>
-      <br/>
-      <br/>
-      <div class="row">
-        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-          {{ form.first_name(class="form-control", placeholder="First Name") }}
-        </div>
-      </div>
-      <br/>
-      <br/>
-      <div class="row">
-        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-          {{ form.last_name(class="form-control", placeholder="Last Name") }}
-        </div>
-      </div>
-      <br/>
-      <br/>
+      {{ macros.form_element('fa fa-id-card', form.patient_id(class="form-control", placeholder="Patient ID")) }}
+      {{ macros.form_element('glyphicon glyphicon-user', form.first_name(class="form-control", placeholder="First Name")) }}
+      {{ macros.form_element('glyphicon glyphicon-user', form.last_name(class="form-control", placeholder="Last Name")) }}
       {{ form.csrf_token() }}
-      <div class="row">
-        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
-          {{ form.submit(class="form-control", disabled=True) }}
-        </div>
-      </div>
+      {{ macros.submit_element() }}
     </form>
   </div>
 {% endblock %}

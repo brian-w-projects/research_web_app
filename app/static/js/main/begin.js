@@ -4,7 +4,7 @@ $(function(){
     var $supplement = $('#supplement');
     var $submit = $('#submit');
 
-    $selectPicker.selectpicker('mobile');
+    $selectPicker.selectpicker('mobile').selectpicker('setStyle', 'btn-lg', 'add');
 
     $selectPicker.on('change', function(){
         if($selectPicker.val() !== ''){

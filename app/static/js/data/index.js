@@ -1,24 +1,31 @@
 $(function(){
-   var $id = $('#patient_id');
-   var $selects = $('.selectpicker');
-   var $formType = $('#form_type');
-   var $dataRequest = $('#data_request');
-   var $submit = $('#submit');
+    var $selects = $('.selectpicker');
+    var $id = $('#patient_id');
+    var $formType = $('#form_type');
+    var $initial = $('#initial_data');
+    var $dataRequest = $('#data_request');
+    var $submit = $('#submit');
 
-   $selects.selectpicker('mobile');
+    $selects.selectpicker('mobile').selectpicker('setStyle', 'btn-lg', 'add');
 
+    $id.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 1);
+    });
 
-   $id.add($formType).add($dataRequest).on('input', function(){
-      if($id.val().length > 0 && $formType.val().length > 0 && $dataRequest.val().length > 0){
-          $submit.removeAttr('disabled');
-      }else{
-          $submit.attr('disabled', 'True');
-      }
-   });
+    $formType.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 1);
+    });
 
-   $submit.on('click', function(){
-       $('.alert').hide();
-       $(this).button('loading');
-   });
+    $initial.on('validate', function(evt, ret){
+        ret.val = true;
+    });
+
+    $dataRequest.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 1);
+    });
+
+    $submit.on('click', function(){
+        $('.alert').hide();
+    });
 
 });

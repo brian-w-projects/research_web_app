@@ -22,19 +22,9 @@
       </div>
     </div>
     <form method="POST">
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback">
-          <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-          {{ form.email(class='form-control', placeholder='Email') }}
-          <span class="glyphicon form-control-feedback"></span>
-        </div>
-      </div>
+      {{ macros.form_element('glyphicon glyphicon-envelope', form.email(class='form-control', placeholder='Email')) }}
       {{ form.csrf_token() }}
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-4">
-          {{ form.submit(class='form-control', disabled=True) }}
-        </div>
-      </div>
+      {{ macros.submit_element() }}
     </form>
   </div>
   <br/>

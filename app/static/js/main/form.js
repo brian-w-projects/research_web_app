@@ -17,6 +17,9 @@ $(function(){
         wide = true;
     }
 
+    $warning.on('click', function(){
+        $(this).hide();
+    });
 
     $.each($selectpicker.add($radios).add($(':checkbox')), function(e){
         feedback($(this));

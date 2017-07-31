@@ -11,26 +11,10 @@
       This page is for researchers only. If you are a patient <a href="{{ url_for('main.index') }}">Click Here</a>
     </div>
     <form method="POST">
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback">
-          <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-          {{ form.email(class='form-control', placeholder='Email') }}
-          <span class="glyphicon form-control-feedback"></span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-4 input-group input-group-lg has-feedback">
-          <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
-          {{ form.token(class='form-control', placeholder='Token') }}
-          <span class="glyphicon form-control-feedback"></span>
-        </div>
-      </div>
+      {{ macros.form_element('glyphicon glyphicon-envelope', form.email(class='form-control', placeholder='Email')) }}
+      {{ macros.form_element('glyphicon glyphicon-tag', form.token(class='form-control', placeholder='Token')) }}
       {{ form.csrf_token() }}
-      <div class="form-group">
-        <div class="col-xs-offset-4 col-xs-4">
-          {{ form.submit(class='form-control', disabled=True) }}
-        </div>
-      </div>
+      {{ macros.submit_element() }}
     </form>
   </div>
 {% endblock %}

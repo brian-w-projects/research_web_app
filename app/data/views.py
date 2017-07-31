@@ -44,6 +44,8 @@ def get_forms(reference_date, initial, form_type, id):
     form_query = Form.query \
         .filter(Form.patient_id == id,
                 Form.name == form_type)
+    if form_query is None:
+        return None
     initial_form = form_query.from_self() \
             .order_by(Form.date) \
             .first().id if initial else -1

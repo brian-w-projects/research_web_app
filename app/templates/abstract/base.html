@@ -8,6 +8,7 @@
   <link href="{{ url_for('static', filename='favicon/favicon.ico') }}" rel="shortcut icon"/>
   <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-select.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='font-awesome-4.7.0/css/font-awesome.min.css') }}" rel="stylesheet">
   {% block header %}
 
   {% endblock %}
@@ -27,6 +28,7 @@
   {{ moment.include_jquery() }}
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap-select.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/abstract/form_base.js') }}"></script>
 
   {% block scripts %}
 

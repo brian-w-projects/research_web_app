@@ -1,72 +1,49 @@
 $(function(){
-    var $submit = $('#submit');
-    var $firstName = $('#first_name').data({'valid': false});
-    var $lastName = $('#last_name').data({'valid': false});
-    var $password = $('#password').data({'valid': false});
-    var $passwordConfirm = $('#password_confirm').data({'valid': false});
+    var $email = $('#email');
+    var $token = $('#token');
+    var $firstName = $('#first_name');
+    var $lastName = $('#last_name');
+    var $password = $('#password');
+    var $passwordConfirm = $('#password_confirm');
 
     $('[data-toogle="tooltip"]').tooltip();
 
-    $firstName.add($lastName).on('input', function(){
-        var $toProcess = $(this);
-        if($toProcess.val().length > 0){
-            $toProcess.parent().addClass('has-success');
-            $toProcess.next().addClass('glyphicon-ok');
-            $toProcess.valid = true;
-        }else{
-            $toProcess.parent().removeClass('has-success');
-            $toProcess.next().removeClass('glyphicon-ok');
-            $toProcess.valid = false;
-        }
-        submitValid();
-    });
 
-    $password.on('input', function(){
-       if($password.val().length >= 10){
-           $password.parent().addClass('has-success').tooltip('hide');
-           $password.next().addClass('glyphicon-ok');
-           $password.valid = true;
-       }else{
-           $password.parent().removeClass('has-success');
-           $password.next().removeClass('glyphicon-ok');
-           $password.valid = false;
-       }
-       submitValid();
-    }).on('focus', function(){
+    $password.on('focus', function(){
         $password.parent().tooltip('show');
+    }).on('blur', function(){
+        $password.parent().tooltip('hide');
     });
 
-    $passwordConfirm.add($password).on('input', function(){
-       if($passwordConfirm.val() === $password.val()) {
-           $passwordConfirm.parent().addClass('has-success').tooltip('hide');
-           $passwordConfirm.next().addClass('glyphicon-ok');
-           $passwordConfirm.valid = true;
-       }else{
-           $passwordConfirm.parent().removeClass('has-success');
-           $passwordConfirm.next().removeClass('glyphicon-ok');
-           $passwordConfirm.valid = false;
-       }
-       submitValid();
-    }).on('focus', function(){
+    $passwordConfirm.on('focus', function(){
         $passwordConfirm.parent().tooltip('show');
+    }).on('blur', function(){
+        $passwordConfirm.parent().tooltip('hide');
     });
 
-    $submit.on('click', function(){
-        $(this).button('loading');
+    $token.on('validate', function(evt, ret){
+       ret.val = true;
     });
 
-    function submitValid(){
-        var check = [$lastName.valid, $firstName.valid, $passwordConfirm.valid, $password.valid];
-        var valid = true;
-        check.forEach(function(ele){
-            if (ele === false && valid === true) {
-                valid = false;
-                $submit.attr('disabled', 'true');
-            }
-        });
-        if(valid === true){
-            $submit.removeAttr('disabled');
-        }
-    }
+    $email.on('validate', function(evt, ret){
+       ret.val = true;
+    });
+
+    $firstName.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 1);
+    });
+
+    $lastName.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 1);
+    });
+
+    $password.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 10);
+    });
+
+    $passwordConfirm.on('validate', function(evt, ret){
+       ret.val = lengthVerify(evt, 10) &&  equalVerify(evt, $password);
+    });
+
 
 });
