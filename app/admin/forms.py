@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import validators, StringField, SubmitField, DateField, SelectField
+from wtforms import validators, StringField, SubmitField, DateField, SelectField, PasswordField, ValidationError
 
 
 class NewSessionForm(FlaskForm):
@@ -8,7 +8,7 @@ class NewSessionForm(FlaskForm):
     last = StringField('Last Name', validators=[validators.DataRequired()])
     date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
     form_name = SelectField('Select Data', choices=[('A', 'A'), ('B', 'B'), ('C', 'C')],
-                               validators=[validators.DataRequired()])
+                            validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -25,5 +25,20 @@ class NewResearcherForm(FlaskForm):
 
 
 class RemoveResearcherForm(FlaskForm):
+    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    submit = SubmitField('Submit')
+
+
+class NewPasswordForm(FlaskForm):
+    current_password = PasswordField('Password', validators=[validators.DataRequired(),
+                                                             validators.Length(min=10)])
+    new_password = PasswordField('New Password', validators=[validators.DataRequired(),
+                                                             validators.EqualTo('confirm_password'),
+                                                             validators.Length(min=10)])
+    confirm_password = PasswordField('Confirm Password', validators=[validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class PasswordResetForm(FlaskForm):
     email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
     submit = SubmitField('Submit')

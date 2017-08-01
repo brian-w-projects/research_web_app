@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect, url_for, abort, current_app, send_file, Response
+from flask import render_template, request, flash, redirect, url_for, Response
 from . import data
 from .forms import SingleDataForm
 from ..models import Form
@@ -24,7 +24,7 @@ def index():
                 return redirect(url_for('data.index'))
             csv = 'Date,'
             questions = len([y for x in Form.get_questions(form_type) for y in x])
-            for i in range(1,questions+1):
+            for i in range(1, questions+1):
                 csv += "{0}i,{0}f,{0}c,{0}n,".format(str(i))
             csv += '\n'
             for single_form in form_process:
@@ -47,8 +47,8 @@ def get_forms(reference_date, initial, form_type, id):
     if form_query is None:
         return None
     initial_form = form_query.from_self() \
-            .order_by(Form.date) \
-            .first().id if initial else -1
+        .order_by(Form.date) \
+        .first().id if initial else -1
     if reference_date:
         return form_query.from_self() \
                     .filter(or_(Form.date > reference_date,
@@ -68,9 +68,9 @@ def get_forms(reference_date, initial, form_type, id):
 def get_date_reference(dates):
     today = datetime.today()
     return {
-        'all' : str(today - timedelta(days=10000)),
-        '12' : str(today - timedelta(days=365)),
-        '6' : str(today - timedelta(days=183)),
-        '3' : str(today - timedelta(days=90)),
-        '1' : str(today - timedelta(days=31)),
+        'all': str(today - timedelta(days=10000)),
+        '12': str(today - timedelta(days=365)),
+        '6': str(today - timedelta(days=183)),
+        '3': str(today - timedelta(days=90)),
+        '1': str(today - timedelta(days=31)),
     }.get(dates, '')

@@ -24,7 +24,13 @@
           <li role="presentation" {% if request.path == url_for('admin.remove_researcher') %}class="active"{% endif %}>
             <a href="{{ url_for('admin.remove_researcher') }}">Remove Researcher</a>
           </li>
+          <li role="presentation" {% if request.path == url_for('admin.reset_password') %}class="active"{% endif %}>
+            <a href="{{ url_for('admin.reset_password') }}">Reset Researcher Password</a>
+          </li>
         {% endif %}
+        <li role="presentation" {% if request.path == url_for('admin.update_password') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.update_password') }}">Update Password</a>
+        </li>
         <li role="presentation"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
       </ul>
     </nav>
