@@ -19,10 +19,10 @@ class DevelopmentConfig(Config):
 
 
 class DeploymentConfig(Config):
-    # SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    # ENCRYPT_KEY = os.environ.get('ENCRYPT_KEY').encode('utf-8')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    ENCRYPT_KEY = os.environ.get('ENCRYPT_KEY').encode('utf-8')
 
 
 config = {
