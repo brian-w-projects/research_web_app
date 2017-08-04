@@ -36,9 +36,9 @@ if __name__ == '__main__':
     #     u = User(patient_id='111', first_name='bob', last_name='bob')
     #     db.session.add(u)
     #     db.session.commit()
-    #     Form.generate_forms(100)
-    # Researcher.generate_researchers(100)
-    # User.generate_users(10)
+        # User.generate_users(10)
+        # Form.generate_forms(1000)
+        # Researcher.generate_researchers(100)
 
 
     app.run(port=5000)

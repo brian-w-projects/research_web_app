@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from config import config
+import flask_excel as excel
 
 moment = Moment()
 db = SQLAlchemy(query_class=BaseQuery)
@@ -23,6 +24,7 @@ def create_app(config_name):
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
+    excel.init_excel(app)
     sslify = SSLify(app)
 
 

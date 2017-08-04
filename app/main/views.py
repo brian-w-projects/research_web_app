@@ -22,8 +22,7 @@ def index():
             user = User.query\
                 .filter(User.patient_id == patient_id)\
                 .first()
-            if user is not None and user.decrypt_first_name() == first_name and \
-                    user.decrypt_last_name() == last_name:
+            if user is not None and user.verify_name(first_name, last_name):
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
                 session['token'] = s.dumps({'auth': clean(patient_id)})
                 session['name'] = first_name + ' ' + last_name

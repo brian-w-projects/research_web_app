@@ -7,6 +7,7 @@ from random import randint
 from bleach import clean
 from flask_login import login_required, current_user
 from decorators import master_required
+from sqlalchemy.sql.expression import or_, desc
 
 
 @admin.route('/')
@@ -32,13 +33,7 @@ def new_researcher():
                 else:
                     flash(u'This email address is already registered. Token is {}'.format(str(check.token)), 'error')
                 return redirect(url_for('admin.new_researcher'))
-            while True:
-                new_token = randint(10000, 99999)
-                collision = Researcher.query \
-                    .filter(Researcher.token == new_token) \
-                    .first()
-                if collision is None:
-                    break
+            new_token = Researcher.generate_token()
             r = Researcher(email=email, token=new_token)
             db.session.add(r)
             db.session.commit()
@@ -97,6 +92,9 @@ def user():
             if user is not None:
                 flash(u'A patient with this ID has already been registered', 'error')
                 return redirect(url_for('admin.user'))
+            s = user.form \
+                .order_by(desc(Form.session)) \
+                .first().session+1 or 1
             to_add = User(first_name=clean_first, last_name=clean_last, patient_id=clean_id)
             db.session.add(to_add)
             db.session.commit()
@@ -121,8 +119,7 @@ def new_session():
             user = User.query \
                 .filter(User.patient_id == clean_id) \
                 .first()
-            if user is None or user.decrypt_last_name() != clean_last or \
-                    user.decrypt_first_name() != clean_first:
+            if user is None or not user.verify_name(clean_first, clean_last):
                 flash(u'This user does not exist. Either add them to system or check data', 'error')
                 return redirect(url_for('admin.new_session'))
             assessment = Form.query \
@@ -185,13 +182,7 @@ def reset_password():
                 flash(u'Master users may not reset their password to prevent lockout', 'error')
                 return redirect(url_for('admin.reset_password'))
             else:
-                while True:
-                    new_token = randint(10000, 99999)
-                    collision = Researcher.query \
-                        .filter(Researcher.token == new_token) \
-                        .first()
-                    if collision is None:
-                        break
+                new_token = Researcher.generate_token()
                 r.token = new_token
                 r.password = ''
                 db.session.add(r)

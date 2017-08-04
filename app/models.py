@@ -7,11 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
 from . import login_manager
 from flask_login import UserMixin
+from sqlalchemy.sql.expression import or_, desc
 
 
 class Form(db.Model):
     __tablename__ = 'form'
     id = db.Column(db.INTEGER, primary_key=True)
+    session = db.Column(db.INTEGER, index=True)
     name = db.Column(db.String)
     date = db.Column(db.DateTime, index=True)
     patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'))
@@ -35,16 +37,23 @@ class Form(db.Model):
         print('Generating Forms')
         seed()
         user_count = User.query.count()
-        form_date = datetime.utcnow() - timedelta(days=365)
+        form_date = datetime.utcnow() - timedelta(days=3650)
         for i in range(count):
             if i%100 == 0:
                 print('{} of {}'.format(str(i), str(count)))
             u = User.query\
                 .offset(randint(0, user_count-1))\
                 .first()
+            try:
+                s = Form.query\
+                    .filter(Form.patient_id == u.patient_id)\
+                    .order_by(desc(Form.session))\
+                    .first().session+1
+            except:
+                s = 1
             name = choice(['A', 'B', 'C'])
             f = Form(patient_id=u.patient_id, section=None,
-                     date=form_date, name=name)
+                     date=form_date, name=name, session=s)
             db.session.add(f)
             for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
                 q = Question(form=f, question=j,
@@ -59,7 +68,8 @@ class Form(db.Model):
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
-        return "Form(id={self.id}, patient_id={self.patient_id}, date={self.date}, section={self.section}, name={self.name})".format(self=self)
+        return "Form(id={self.id}, session={self.session}, patient_id={self.patient_id}, " \
+               "date={self.date}, section={self.section}, name={self.name})".format(self=self)
 
     def __str__(self):
         return self.__repr__()
@@ -90,40 +100,32 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.INTEGER, primary_key=True)
     patient_id = db.Column(db.String, index=True, unique=True)
-    first_name_encrypt = db.Column(db.LargeBinary)
-    last_name_encrypt = db.Column(db.LargeBinary)
+    first_name_hash = db.Column(db.String)
+    last_name_hash = db.Column(db.String)
 
     @property
     def first_name(self):
-        raise AttributeError('first_name is encrypted')
+        raise AttributeError('first name is hashed')
 
     @first_name.setter
     def first_name(self, p):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        self.first_name_encrypt = f.encrypt(p.encode('utf-8'))
-
-    def decrypt_first_name(self):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        return f.decrypt(self.first_name_encrypt).decode('utf-8')
+        self.first_name_hash = generate_password_hash(p)
 
     @property
     def last_name(self):
-        raise AttributeError('first_name is encrypted')
+        raise AttributeError('last name is hashed')
 
     @last_name.setter
     def last_name(self, p):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        if isinstance(p, str):
-            p = p.encode('utf-8')
-        self.last_name_encrypt = f.encrypt(p)
+        self.last_name_hash = generate_password_hash(p)
 
-    def decrypt_last_name(self):
-        f = Fernet(current_app.config['ENCRYPT_KEY'])
-        return f.decrypt(self.last_name_encrypt).decode('utf-8')
+    def verify_name(self, f, l):
+        return check_password_hash(self.first_name_hash, f) and check_password_hash(self.last_name_hash, l)
 
     @staticmethod
     def generate_users(count):
         import forgery_py
+        from random import randint
 
         print('Generating users')
         for i in range(count):
@@ -131,24 +133,21 @@ class User(db.Model):
                 print('{} of {}'.format(str(i), str(count)))
             first = forgery_py.name.first_name().strip().lower()
             last = forgery_py.name.last_name().strip().lower()
+            patient_id = str(randint(1, 10000))
+            while True:
+                u = User.query.filter(User.patient_id == patient_id).first()
+                if u is None:
+                    break
+                patient_id = randint(1, 10000)
 
-            add = True
-
-            for user in User.query.all():
-                if user.decrypt_first_name() == first and \
-                                user.decrypt_last_name() == last:
-                    add = False
-
-            if add is False:
-                continue
-
-            u = User(first_name=first, last_name=last)
+            u = User(first_name=first, last_name=last, patient_id=patient_id)
             db.session.add(u)
             db.session.commit()
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
-        return "User(first_name={self.first_name_encrypt}, last_name={self.last_name_encrypt})".format(self=self)
+        return "User(patient_id={self.patient_id}, first_name={self.first_name_encrypt}, " \
+               "last_name={self.last_name_encrypt})".format(self=self)
 
     def __str__(self):
         return self.__repr__()
@@ -180,6 +179,18 @@ class Researcher(UserMixin, db.Model):
 
     def __repr__(self):
         return "Researcher(email={self.email}, first_name={self.first_name}, last_name={self.last_name})".format(self=self)
+
+    @staticmethod
+    def generate_token():
+        from random import randint
+
+        while True:
+            to_ret = randint(10000, 99999)
+            collision = Researcher.query \
+                .filter(Researcher.token == to_ret) \
+                .first()
+            if collision is None:
+                return to_ret
 
     @staticmethod
     def generate_researchers(count):
