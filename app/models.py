@@ -52,9 +52,11 @@ class Form(db.Model):
             except:
                 s = 1
             name = choice(['A', 'B', 'C'])
-            f = Form(patient_id=u.patient_id, section=None,
+            f = Form(patient_id=u.patient_id,
                      date=form_date, name=name, session=s)
+            u.session += 1
             db.session.add(f)
+            db.session.add(u)
             for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
                 q = Question(form=f, question=j,
                              intensity=randint(0,4), frequency=randint(0,4),
@@ -102,6 +104,7 @@ class User(db.Model):
     patient_id = db.Column(db.String, index=True, unique=True)
     first_name_hash = db.Column(db.String)
     last_name_hash = db.Column(db.String)
+    sessions = db.Column(db.INTEGER, default=0)
 
     @property
     def first_name(self):
@@ -153,6 +156,37 @@ class User(db.Model):
         return self.__repr__()
 
 
+class Protocol(db.Model):
+    __tablename__ = 'protocol'
+    id = db.Column(db.INTEGER, primary_key=True)
+    form_id = db.Column(db.INTEGER, db.ForeignKey('form.id'))
+    patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'), index=True)
+    row = db.Column(db.INTEGER)
+    r_last_name = db.Column(db.String, db.ForeignKey('researcher.last_name'), index=True)
+    protocol_type = db.Column(db.String)
+    protocol_name_1 = db.Column(db.String)
+    protocol_name_2 = db.Column(db.String)
+    changes = db.Column(db.BOOLEAN, default=False)
+    frequencies = db.Column(db.String)
+    label = db.Column(db.String)
+    duration = db.Column(db.String)
+    game = db.Column(db.String)
+    notes = db.Column(db.TEXT)
+
+    form = db.relationship('Form', backref=backref('protocol', lazy='dynamic'))
+    user = db.relationship('User', backref=backref('protocol', lazy='dynamic'))
+    researcher = db.relationship('Researcher', backref=backref('protocol', lazy='dynamic'))
+
+    def __repr__(self):
+        return "Protocol(patient_id={self.patient_id}, row={self.row}, " \
+               "researcher={self.r_last_name}, type={self.protocol_type}, " \
+               "name={self.protocol_name_1}-{self.protocol_name_2}, frequencies={self.frequencies}, " \
+               "label={self.label}, duration={self.duration}, notes={self.notes})".format(self=self)
+
+    def __str__(self):
+        return self.__repr__()
+
+
 class Researcher(UserMixin, db.Model):
     __tablename__ = 'researcher'
     id = db.Column(db.INTEGER, primary_key=True)
@@ -160,7 +194,7 @@ class Researcher(UserMixin, db.Model):
     password_hash = db.Column(db.String)
     role = db.Column(db.String, default='admin')
     first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
+    last_name = db.Column(db.String, unique=True)
     token = db.Column(db.INTEGER, nullable=True)
 
     @property

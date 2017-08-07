@@ -1,7 +1,7 @@
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from . import admin
-from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm, NewPasswordForm, PasswordResetForm
-from ..models import Form, User, Researcher
+from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm, NewPasswordForm, PasswordResetForm, ProtocolForm
+from ..models import Form, User, Researcher, Protocol
 from .. import db
 from random import randint
 from bleach import clean
@@ -92,9 +92,6 @@ def user():
             if user is not None:
                 flash(u'A patient with this ID has already been registered', 'error')
                 return redirect(url_for('admin.user'))
-            s = user.form \
-                .order_by(desc(Form.session)) \
-                .first().session+1 or 1
             to_add = User(first_name=clean_first, last_name=clean_last, patient_id=clean_id)
             db.session.add(to_add)
             db.session.commit()
@@ -129,8 +126,11 @@ def new_session():
             if assessment is not None:
                 flash(u'This patient already has a session scheduled for this day', 'error')
                 return redirect(url_for('admin.new_session'))
-            new_assessment = Form(patient_id=user.patient_id, date=clean_date, name=clean_form_type)
+            new_assessment = Form(patient_id=user.patient_id, date=clean_date, name=clean_form_type,
+                                  session=user.sessions+1)
+            user.sessions += 1
             db.session.add(new_assessment)
+            db.session.add(user)
             db.session.commit()
             flash(u'This patient has a new session scheduled.', 'success')
             return redirect(url_for('admin.new_session'))
@@ -196,3 +196,82 @@ def reset_password():
         .filter(Researcher.token != None) \
         .all()
     return render_template('admin/reset_password.html', form=form, display=display)
+
+
+@admin.route('/protocol', methods=['GET', 'POST'])
+@login_required
+def protocol():
+    form = ProtocolForm(request.form)
+    if request.method == 'POST':
+        if form.validate():
+            last_protocol = []
+            if Protocol.query.filter(Protocol.patient_id == form.patient_id.data).first() is not None:
+                last_form_id = Protocol.query \
+                    .filter(Protocol.patient_id == form.patient_id.data) \
+                    .order_by(desc(Protocol.form_id)) \
+                    .first().form_id
+                last_protocol = sorted(Protocol.query \
+                    .filter(Protocol.patient_id == form.patient_id.data,
+                            Protocol.form_id == int(last_form_id)) \
+                    .order_by(desc(Protocol.form_id)) \
+                    .all(), key=lambda x: x.row)
+            return render_template('admin/protocol.html', patient_id=clean(form.patient_id.data),
+                                                           form_id=clean(form.form_id.data),
+                                                            last=last_protocol)
+        else:
+            flash(u'Please check form entries', 'error')
+            return redirect(url_for('admin.protocol'))
+    return render_template('admin/protocol_init.html', form=form)
+
+
+@admin.route('/init_ajax', methods=['POST'])
+@login_required
+def init_ajax():
+    id = request.get_json(force=True)
+    to_ret = {}
+    sessions = Form.query \
+        .filter(Form.patient_id == id['id']) \
+        .all()
+    for ele in sessions:
+        if ele.protocol.first() is None:
+            to_ret[str(ele.id)] = (ele.id, str(ele.date)[:10])
+    if len(to_ret) == 0:
+        return jsonify({'code': '400'})
+    else:
+        to_ret['code'] = '201'
+        return jsonify(to_ret)
+
+
+@admin.route('/protocol_ajax', methods=['POST'])
+@login_required
+def protocol_ajax():
+    data = request.get_json(force=True)
+    patient_id = data[0]['value']
+    form_id = data[1]['value']
+    notes = data[32]['value']
+    if Protocol.query.filter(Protocol.patient_id == patient_id).first() is not None:
+        last_form_id = Protocol.query \
+            .filter(Protocol.patient_id == patient_id) \
+            .order_by(desc(Protocol.form_id)) \
+            .first().form_id
+        last_protocols = [x.frequencies for x in Protocol.query \
+            .filter(Protocol.patient_id == patient_id,
+                    Protocol.form_id == last_form_id) \
+            .order_by(Protocol.row).all()]
+    else:
+        last_protocols = []
+    for i in range(2,32,6):
+        if data[i]['value'] != '':
+            new_protocol = Protocol(patient_id=patient_id, row=int(data[i]['name'][0]),
+                                    r_last_name = current_user.last_name, protocol_type=data[i]['value'],
+                                    protocol_name_1=data[i+1]['value'], protocol_name_2=data[i+2]['value'],
+                                    frequencies=data[i+3]['value'], label=data[i+4]['value'],
+                                    duration=data[i+5]['value'], game='filler', notes=notes if i == 2 else '',
+                                    form_id=form_id)
+            if len(last_protocols) > 0:
+                new_protocol.changes = False if last_protocols[0] == data[i+3]['value'] else True
+                del last_protocols[0]
+            db.session.add(new_protocol)
+            db.session.commit()
+    flash(u'Data successfully saved', 'success')
+    return jsonify({'code': '201'})

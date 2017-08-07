@@ -36,16 +36,25 @@ def get_xls(process, form_type):
     header = ['Patient', 'Session', 'Date']
     header.extend([y for x in Form.get_questions(form_type) for y in x])
     build = [[list(header)] for x in range(4)]
+    protocol_header = ['Patient', 'Session', 'Date', 'Type', 'Name', 'Changes', 'Frequencies', 'Label', 'Duration', 'Notes']
+    protocol = [list(protocol_header)]
     for single in process:
-        line = [list('{} {} {}'.format(single.patient_id, single.session, single.date)[:-16].split(' '))
+        line = [list('{} {} {}'.format(single.patient_id, single.session, single.date)[:-9].split(' '))
                 for x in range(4)]
         for q in single.question:
             for i, val in zip(range(0,4), (q.intensity, q.frequency, q.change, q.notes)):
                 line[i].append(val)
         for i in range(4):
             build[i].append(line[i])
+        for protocol_line in single.protocol:
+            protocol_to_add = [single.patient_id, single.session, str(single.date)[:-9], protocol_line.protocol_type,
+                               protocol_line.protocol_name_1+'-'+protocol_line.protocol_name_2,
+                           protocol_line.changes, protocol_line.frequencies, protocol_line.label,
+                               protocol_line.duration, protocol_line.notes]
+            protocol.append(protocol_to_add)
     for key, value in zip(('intensity', 'frequency', 'change', 'notes'), range(0,4)):
         to_ret[key] = build[value]
+    to_ret['protocol'] = protocol
     return to_ret
 
 

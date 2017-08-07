@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import validators, StringField, SubmitField, DateField, SelectField, PasswordField, ValidationError
+from wtforms import validators, StringField, SubmitField, DateField, SelectField, PasswordField, TextAreaField
 
 
 class NewSessionForm(FlaskForm):
@@ -41,4 +41,10 @@ class NewPasswordForm(FlaskForm):
 
 class PasswordResetForm(FlaskForm):
     email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    submit = SubmitField('Submit')
+
+
+class ProtocolForm(FlaskForm):
+    patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
+    form_id = StringField('Session', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')

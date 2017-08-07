@@ -1,0 +1,12 @@
+#row-1, #row-2, #row-3, #row-4{
+    display: none;
+}
+
+th{
+    text-align: center;
+}
+
+#notes{
+    resize: none;
+    height: 150px;
+}

@@ -55,7 +55,7 @@
 {% endmacro %}
 
 {% macro flashed_messages(messages) %}
-  <div class="container-fluid">
+  <div class="flashes container-fluid">
     <div class="col-xs-10 col-xs-offset-1">
       {% for category, message in messages %}
         {% if category == 'error' %}
