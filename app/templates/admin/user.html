@@ -23,6 +23,7 @@
       {{ macros.form_element('fa fa-id-card', form.patient_id(class="form-control", placeholder='Patient ID')) }}
       {{ macros.form_element('glyphicon glyphicon-user', form.first(class="form-control", placeholder='First Name')) }}
       {{ macros.form_element('glyphicon glyphicon-user', form.last(class="form-control", placeholder='Last Name')) }}
+      {{ macros.select_element('Group', form.group, 'group') }}
       {{ form.csrf_token() }}
       {{ macros.submit_element() }}
     </form>

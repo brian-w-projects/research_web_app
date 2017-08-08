@@ -16,6 +16,8 @@ class NewUserForm(FlaskForm):
     patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
     first = StringField('First', validators=[validators.DataRequired()])
     last = StringField('Last', validators=[validators.DataRequired()])
+    group = SelectField('Group', choices=[('1','1'),('2','2'),('3','3')],
+                        validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 
 

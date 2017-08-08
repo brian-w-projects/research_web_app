@@ -1,35 +1,42 @@
 $(function(){
-   var current = initialShow;
+   var current = initialShow===0? 1 : initialShow;
    var $row = $('#add-row');
    var $removeRow = $('#remove-row');
    var $submit = $('#submit');
    var $form = $('form');
+   var $protocolType = $('.protocol-type');
 
    for(var i = 0; i < initialShow; i++){
        $("#row-" + i).show();
    }
 
-   if(initialShow == 0){
+   for(var i = 0; i < 10; i++){
+       var $toCheck = $('#'+i+'-protocol-type');
+       if($toCheck.val() === '2ch' && $('#'+(i-1)+'-protocol-type').val() === '2ch'){
+           $toCheck.prop('disabled', true).selectpicker('refresh');
+       }
+    }
+
+   if(initialShow === 0){
        $removeRow.hide();
-   }else if(initialShow == 5){
+   }else if(initialShow === 10){
        $row.hide();
    }
 
-   $row.on('click', function(){
-       if(current !== 5){
-           copyRows(current-1);
-           $('#row-' + current).show();
-           current++;
-           $removeRow.show();
-       }
-       if(current === 5){
-           $row.hide();
+   $protocolType.on('changed.bs.select', function(){
+       if($(this).val() === '2ch'){
+           addRow();
+           $('#'+(current-1)+'-protocol-type').prop('disabled', true).selectpicker('refresh');
        }
    });
 
+   $row.on('click', addRow);
+
    $removeRow.on('click', function(){
       if(current !== 0){
+          console.log(current);
           current--;
+          $('#'+current+'-protocol-type').prop('disabled', false).selectpicker('refresh');
           $('#row-' + current).hide();
           $row.show();
       }
@@ -40,7 +47,8 @@ $(function(){
 
    $submit.on('click', function(e){
         e.preventDefault();
-        // $(this).button('loading');
+        $(this).button('loading');
+        $form.find(':input:disabled').removeAttr('disabled');
         $.ajax({
             type: 'POST',
             contentType: 'application/json;charset=UTF-8',
@@ -57,6 +65,18 @@ $(function(){
             }
         });
     });
+
+   function addRow(){
+       if(current !== 10){
+           copyRows(current-1);
+           $('#row-' + current).show();
+           current++;
+           $removeRow.show();
+       }
+       if(current === 10){
+           $row.hide();
+       }
+    }
 });
 
 
@@ -66,3 +86,4 @@ function copyRows(current){
             .selectpicker('val', $(this).val());
     });
 }
+

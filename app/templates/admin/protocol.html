@@ -46,10 +46,10 @@
           </tr>
         </thead>
         <tbody>
-          {% for i in range(5) %}
+          {% for i in range(10) %}
             <tr id="row-{{ i }}">
               <td>
-                <select class="selectpicker show-tick" title="Protocol Type" id="{{ i }}-protocol-type"
+                <select class="selectpicker show-tick protocol-type" title="Protocol Type" id="{{ i }}-protocol-type"
                         name="{{ i }}-protocol-type">
                   {%  for ele in ('2ch', 'hrv', 'coherence', 'bipolar', 'monopolar') %}
                     {% if last|length > i and last[i].protocol_type == ele %}

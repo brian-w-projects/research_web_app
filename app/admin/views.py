@@ -248,7 +248,7 @@ def protocol_ajax():
     data = request.get_json(force=True)
     patient_id = data[0]['value']
     form_id = data[1]['value']
-    notes = data[32]['value']
+    notes = data[62]['value']
     if Protocol.query.filter(Protocol.patient_id == patient_id).first() is not None:
         last_form_id = Protocol.query \
             .filter(Protocol.patient_id == patient_id) \
@@ -260,14 +260,14 @@ def protocol_ajax():
             .order_by(Protocol.row).all()]
     else:
         last_protocols = []
-    for i in range(2,32,6):
+    for i in range(2,62,6):
         if data[i]['value'] != '':
             new_protocol = Protocol(patient_id=patient_id, row=int(data[i]['name'][0]),
-                                    r_last_name = current_user.last_name, protocol_type=data[i]['value'],
-                                    protocol_name_1=data[i+1]['value'], protocol_name_2=data[i+2]['value'],
-                                    frequencies=data[i+3]['value'], label=data[i+4]['value'],
-                                    duration=data[i+5]['value'], game='filler', notes=notes if i == 2 else '',
-                                    form_id=form_id)
+                    r_last_name = current_user.last_name, protocol_type=data[i]['value'],
+                    protocol_name_1=data[i+1]['value'], protocol_name_2=data[i+2]['value'],
+                    frequencies=data[i+3]['value'], label=data[i+4]['value'],
+                    duration=data[i+5]['value'], game='filler', notes=notes if i == 2 else '',
+                    form_id=form_id)
             if len(last_protocols) > 0:
                 new_protocol.changes = False if last_protocols[0] == data[i+3]['value'] else True
                 del last_protocols[0]

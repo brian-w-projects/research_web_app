@@ -24,7 +24,7 @@ def index():
                 flash(u'No data from this search', 'error')
                 return redirect(url_for('data.index'))
             return excel.make_response_from_book_dict(get_xls(form_process, form_type), 'xls',
-                                                      file_name='test')
+                                                      file_name=id)
         else:
             flash(u'Please check form', 'error')
             return redirect(url_for('data.index'))
@@ -33,25 +33,40 @@ def index():
 
 def get_xls(process, form_type):
     to_ret = {}
-    header = ['Patient', 'Session', 'Date']
+    header = ['Patient', 'Group', 'Session', 'Date']
     header.extend([y for x in Form.get_questions(form_type) for y in x])
     build = [[list(header)] for x in range(4)]
-    protocol_header = ['Patient', 'Session', 'Date', 'Type', 'Name', 'Changes', 'Frequencies', 'Label', 'Duration', 'Notes']
+    protocol_header = ['Patient', 'Group', 'Session', 'Date', 'Type', 'Name', 'Changes', 'Frequencies', 'Label', 'Duration',
+                       'Name', 'Changes', 'Frequencies', 'Label', 'Duration', 'Notes']
     protocol = [list(protocol_header)]
     for single in process:
-        line = [list('{} {} {}'.format(single.patient_id, single.session, single.date)[:-9].split(' '))
+        line = [list('{} {} {} {}'.format(single.patient_id, single.user.group, single.session, single.date)[:-9].split(' '))
                 for x in range(4)]
         for q in single.question:
             for i, val in zip(range(0,4), (q.intensity, q.frequency, q.change, q.notes)):
                 line[i].append(val)
         for i in range(4):
             build[i].append(line[i])
+        append = False
         for protocol_line in single.protocol:
-            protocol_to_add = [single.patient_id, single.session, str(single.date)[:-9], protocol_line.protocol_type,
-                               protocol_line.protocol_name_1+'-'+protocol_line.protocol_name_2,
-                           protocol_line.changes, protocol_line.frequencies, protocol_line.label,
-                               protocol_line.duration, protocol_line.notes]
-            protocol.append(protocol_to_add)
+            if not append:
+                protocol_to_add = [single.patient_id, single.user.group, single.session, str(single.date)[:-9],
+                                   protocol_line.protocol_type,
+                                   protocol_line.protocol_name_1 + '-' + protocol_line.protocol_name_2,
+                                   protocol_line.changes, protocol_line.frequencies, protocol_line.label,
+                                   protocol_line.duration, '','','','','',protocol_line.notes]
+                protocol.append(protocol_to_add)
+                if protocol_line.protocol_type == '2ch':
+                    append = True
+            else:
+                second_line = [protocol_line.protocol_name_1 + '-' + protocol_line.protocol_name_2,
+                                   protocol_line.changes, protocol_line.frequencies, protocol_line.label,
+                                   protocol_line.duration]
+                second_line.append(protocol[-1].pop())
+                protocol[-1] = protocol[-1][:-5]
+                protocol[-1].extend(second_line)
+                append = False
+
     for key, value in zip(('intensity', 'frequency', 'change', 'notes'), range(0,4)):
         to_ret[key] = build[value]
     to_ret['protocol'] = protocol
