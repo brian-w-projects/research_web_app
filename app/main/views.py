@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, session, flash, redirect, url_for, current_app
 from . import main
 from .forms import NewSessionForm, IdentifyAssessmentForm
-from ..models import Form, Question, User
+from ..models import Form, Question, User, Intake
 from .. import db
 from decorators import token_required
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
@@ -26,6 +26,9 @@ def index():
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
                 session['token'] = s.dumps({'auth': clean(patient_id)})
                 session['name'] = first_name + ' ' + last_name
+                if user.date_of_birth is None:
+                    session['intake_page'] = 0
+                    return redirect(url_for('main.general_information'))
                 return redirect(url_for('main.begin'))
         flash(u'Please check entered data.', 'error')
         return redirect(url_for('main.index'))
@@ -163,3 +166,66 @@ def finish(single_user):
     db.session.commit()
     session.clear()
     return render_template('main/finish.html')
+
+
+@main.route('/general_information', methods=['GET', 'POST'])
+@token_required
+def general_information(single_user):
+    if request.method == 'POST':
+        process = request.form
+        single_user.date_of_birth = process['1']
+        single_user.guardian_names = process['2']
+        single_user.custody = process['3']
+        single_user.gender = process['4']
+        single_user.address = process['5']
+        single_user.phone = process['6']
+        single_user.email = process['7']
+        single_user.handed = process['8']
+        single_user.diagnosis = process['9']
+        single_user.reason_for_treatment = process['10']
+        single_user.current_medication = process['11']
+        single_user.previous_medication = process['12']
+        single_user.referral = process['13']
+        db.session.add(single_user)
+        db.session.commit()
+        return redirect(url_for('main.intake'))
+    questions = User.get_intake_questions()
+    return render_template('main/general_information.html', questions=questions)
+
+
+@main.route('/intake', methods=['GET', 'POST'])
+@token_required
+def intake(single_user):
+    page = session['intake_page']
+    questions = Intake.get_intake_questions()
+    buffer = sum([len(questions[s]) for s in range(0, page)])
+    if request.method == 'POST':
+        for i in range(1,len(questions[page])+1):
+            to_add = Intake(patient_id=single_user.patient_id, question=i+buffer,
+                            answer=request.form[str((i+buffer))+ " a"],
+                            details=request.form[(str(i+buffer))+ " n"])
+            db.session.add(to_add)
+            db.session.commit()
+        session['intake_page'] += 1
+        page += 1
+        buffer = sum([len(questions[s]) for s in range(0, page)])
+    if session['intake_page'] >= len(questions):
+        return redirect(url_for('main.intake_finish'))
+    return render_template('main/intake_form.html', questions=questions[page],
+                           complete=(page+1)*100//len(questions),
+                           buffer=buffer)
+
+
+@main.route('/intake_finish')
+@token_required
+def intake_finish(single_user):
+    session.clear()
+    return render_template('main/intake_finish.html')
+
+
+
+
+
+
+
+

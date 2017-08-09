@@ -25,11 +25,10 @@ def hashed_static_file(endpoint, values):
 
 
 if __name__ == '__main__':
-    #
+
     # with app.app_context():
     #     db.drop_all()
     #     db.create_all()
-    #
     #     r = Researcher(role='master', email='p@p.com', password='asdfasdfasdf', first_name='master',
     #                    last_name='blaster', token=None)
     #     db.session.add(r)

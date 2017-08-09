@@ -4,6 +4,8 @@ $(function(){
     var $formType = $('#form_type');
     var $initial = $('#initial_data');
     var $dataRequest = $('#data_request');
+    var $patient_data = $('#patient_data');
+    var $intake_data = $('#intake_data');
     var $submit = $('#submit');
 
     $selects.selectpicker('mobile').selectpicker('setStyle', 'btn-lg', 'add');
@@ -18,6 +20,14 @@ $(function(){
 
     $initial.on('validate', function(evt, ret){
         ret.val = true;
+    });
+
+    $patient_data.on('validate', function(evt, ret){
+       ret.val = true;
+    });
+
+    $intake_data.on('validate', function(evt, ret){
+       ret.val = true;
     });
 
     $dataRequest.on('validate', function(evt, ret){

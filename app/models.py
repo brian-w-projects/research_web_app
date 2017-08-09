@@ -147,6 +147,20 @@ class User(db.Model):
     first_name_hash = db.Column(db.String)
     last_name_hash = db.Column(db.String)
     sessions = db.Column(db.INTEGER, default=0)
+    initial_intake = db.Column(db.DateTime, default=datetime.utcnow())
+    date_of_birth = db.Column(db.String, nullable=True)
+    guardian_names = db.Column(db.String, nullable=True)
+    custody = db.Column(db.String, nullable=True)
+    gender = db.Column(db.String, nullable=True)
+    address = db.Column(db.String, nullable=True)
+    phone = db.Column(db.String, nullable=True)
+    email = db.Column(db.String, nullable=True)
+    handed = db.Column(db.String, nullable=True)
+    diagnosis = db.Column(db.String, nullable=True)
+    reason_for_treatment = db.Column(db.String, nullable=True)
+    current_medication = db.Column(db.String, nullable=True)
+    previous_medication = db.Column(db.String, nullable=True)
+    referral = db.Column(db.String, nullable=True)
 
     @property
     def first_name(self):
@@ -166,6 +180,13 @@ class User(db.Model):
 
     def verify_name(self, f, l):
         return check_password_hash(self.first_name_hash, f) and check_password_hash(self.last_name_hash, l)
+
+    @staticmethod
+    def get_intake_questions():
+        return ['Date of Birth', 'Parents or Guardians Names', 'Custody', 'Gender', 'Address',
+                 'Phone Number', 'Email Address', 'Handed (left, right or both)', 'Previous and current diagnosis',
+                'Reason for Treatment', 'Current Medication (generic name, dosage, time of day)',
+                'Previous Medication (generic name, dosage, time of day)', 'Source of Referral']
 
     @staticmethod
     def generate_users(count):
@@ -228,6 +249,54 @@ class Protocol(db.Model):
     def __str__(self):
         return self.__repr__()
 
+
+class Intake(db.Model):
+    __tablename__ = 'intake'
+    id = db.Column(db.INTEGER, primary_key=True)
+    patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'), index=True)
+    question = db.Column(db.INTEGER)
+    answer = db.Column(db.String, nullable=True)
+    details = db.Column(db.String)
+
+    user = db.relationship('User', backref=backref('intake', lazy='dynamic'))
+
+    @staticmethod
+    def get_intake_questions():
+        return [['Birth trauma and or hypoxia', 'Health problems during early childhood',
+                 'Early development, such as started to talk, walk too late',
+                 'Head trauma (with loss of consciousness)', 'Poor grades in school, poor performance at work'],
+                ['Gastrointestinal disease (Gastirties, colities, etc.),'
+                 'Cardiac and pulmonary disease (high blood pressure, arrtimias, etc.)',
+                 'Neurological disease (tumors, isquemic events, etc)',
+                 'Respiratory disease (asthma, bronquitis, etc)',
+                 'Hospitalizations (dates and cause)',
+                 'Surgeries (dates and cause)',
+                 'Allergies (food, environment or medications)',
+                 'Apetitie (low, uncontrollable, etc)'],
+                ['Often having headaches and or migraines', 'Feels weak and passive during daytime',
+                 'Sleep-related difficulties', 'Abuses alcohol or drugs', 'Has history of seizures'],
+                ['Perceptual difficulties in vision, hearing, touch (dyslexia, paresis, etc.)',
+                 'Difficulties in social interaction and communication, austistic spectrum',
+                 'Motor-related difficulties, such as fine motor, tremor, rigidity, apraxia',
+                 'Attention difficulties',
+                 'Impulsiveness', 'Difficulties in correcting behavior', 'Psychosis (hallucinations, delusions, etc.)',
+                 'Occupied by mostly positive thoughts, manic',
+                 'Occupied by mostly negative thoughts, depressed',
+                 'Anxious',
+                 'Poor memory for recent events',
+                 'Other forms of memory deficit'],
+                ['Current therapies (type and dates)',
+                 'Previous Therapies (types and dates)',
+                 'Eats 3 or more meals a day',
+                 'Types of food',
+                 'Supplements']]
+
+    def __repr__(self):
+        return "Intake(patient_id={self.patient_id}, question={self.question}, answer={self.answer}," \
+               "details={self.details}".format(self=self)
+
+    def __str__(self):
+        return self.__repr__()
 
 class Researcher(UserMixin, db.Model):
     __tablename__ = 'researcher'

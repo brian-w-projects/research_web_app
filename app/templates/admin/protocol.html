@@ -51,7 +51,7 @@
               <td>
                 <select class="selectpicker show-tick protocol-type" title="Protocol Type" id="{{ i }}-protocol-type"
                         name="{{ i }}-protocol-type">
-                  {%  for ele in ('2ch', 'hrv', 'coherence', 'bipolar', 'monopolar') %}
+                  {%  for ele in ('hrv', 'coherence', 'bipolar', 'monopolar', '2ch') %}
                     {% if last|length > i and last[i].protocol_type == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}

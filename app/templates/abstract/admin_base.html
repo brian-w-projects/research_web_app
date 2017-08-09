@@ -14,6 +14,9 @@
         <li role="presentation" {% if request.path == url_for('admin.new_session') %}class="active"{% endif %}>
           <a href="{{ url_for('admin.new_session') }}">New Session</a>
         </li>
+        <li role="presentation" {% if request.path == url_for('admin.protocol') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.protocol') }}">Protocol Form</a>
+        </li>
         <li role="presentation" {% if request.path == url_for('data.index') %}class="active"{% endif %}>
           <a href="{{ url_for('data.index') }}">Retrieve Data</a>
         </li>

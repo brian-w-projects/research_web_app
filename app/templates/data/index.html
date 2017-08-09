@@ -27,6 +27,18 @@
         </div>
       </div>
       <br/>
+      <div class="row">
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.patient_data() }} Include Patient Information
+        </div>
+      </div>
+      <br/>
+      <div class="row">
+        <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+          {{ form.intake_data() }} Include Intake Information
+        </div>
+      </div>
+      <br/>
       {{ macros.select_element('Data Request', form.data_request, 'data_request') }}
       {{ macros.select_element('Form', form.form_type, 'form_type') }}
       {{ form.csrf_token() }}

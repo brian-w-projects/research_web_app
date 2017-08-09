@@ -1,0 +1,61 @@
+{% extends 'abstract/base.html' %}
+
+{% block header %}
+  <title>Intake Form</title>
+  <link href="{{ url_for('static', filename='css/main/form.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/main/intake_form.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
+  <div class="container-fluid">
+    <div class="col-xs-10">
+      <h1>Welcome {{ session['name'] }}</h1>
+      <h2>Please complete the intake form.</h2>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <form method="POST">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Response</th>
+            <th>Additional Information</th>
+          </tr>
+        </thead>
+          <tbody>
+            {% for question in questions %}
+              <tr>
+                <td class="question">{{ question }}</td>
+                <td>
+                  <select class="selectpicker show-tick" title='Select' name="{{ loop.index + buffer }} a">
+                    <option value="y">Yes</option>
+                    <option value="n">No</option>
+                  </select>
+                </td>
+                <td>
+                  <textarea class="form-control" name="{{ loop.index + buffer}} n"
+                            placeholder="Additional Information"></textarea>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <input id='submit' name='submit' type="submit" value="Submit" class="form-control btn-info">
+    </form>
+  </div>
+  <footer>
+    <div class="progress">
+      <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ complete }}%; min-width: 2em;">
+        {{ complete }}% Complete
+      </div>
+    </div>
+  </footer>
+{% endblock %}
+
+{% block scripts %}
+{#  <script src="{{ url_for('static', filename='js/main/general_information.js') }}"></script>#}
+{% endblock %}
