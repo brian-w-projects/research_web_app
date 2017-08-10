@@ -16,7 +16,7 @@
 
 {% macro radio_bsw_macro(name, num, response) %}
   <div class="radio input-lg has-feedback">
-    {% for i in ('B','S','W') %}
+    {% for i in ('W','S','B') %}
       <label class="radio-inline">
         {% if loop.index0 == response %}
           <input type="radio" name="{{ num }} {{ name }}" value="{{ loop.index0 }}" checked/>

@@ -7,7 +7,7 @@ class NewSessionForm(FlaskForm):
     first = StringField('First Name', validators=[validators.DataRequired()])
     last = StringField('Last Name', validators=[validators.DataRequired()])
     date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
-    form_name = SelectField('Select Data', choices=[('A', 'A'), ('B', 'B'), ('C', 'C')],
+    form_name = SelectField('Select Data', choices=[('A', 'Self Assessment')],
                             validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 

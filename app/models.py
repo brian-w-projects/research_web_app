@@ -65,7 +65,10 @@ class Form(db.Model):
                        'Lack of responsiveness to touch, pain and loud sounds',
                        'Tics',
                        'Skin crawling sensations',
-                       'Bed Wetting']],
+                       'Bed Wetting'],
+                      ['Other (indicate in notes)',
+                       'Other (indicate in notes)',
+                       'Other (indicate in notes)']],
                 'B': [['B1', 'B2', 'B3', 'B4', 'B5']],
                 'C': [['C1', 'C2', 'C3'], ['C4']]}.get(name)
 
@@ -147,6 +150,7 @@ class User(db.Model):
     first_name_hash = db.Column(db.String)
     last_name_hash = db.Column(db.String)
     sessions = db.Column(db.INTEGER, default=0)
+    intake_page = db.Column(db.INTEGER, default=0, nullable=True)
     initial_intake = db.Column(db.DateTime, default=datetime.utcnow())
     date_of_birth = db.Column(db.String, nullable=True)
     guardian_names = db.Column(db.String, nullable=True)

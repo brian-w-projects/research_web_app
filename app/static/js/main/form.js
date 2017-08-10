@@ -65,7 +65,7 @@ $(function(){
                 type: 'POST',
                 contentType: 'application/json;charset=UTF-8',
                 url: submitData,
-                data: JSON.stringify(objectifyForm($form.serializeArray(), $(e.target))),
+                data: JSON.stringify(objectifyForm($form.serializeArray(), $(this))),
                 beforeSend: function(xhr, settings){
                     if(!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain){
                         xhr.setRequestHeader('X-CSRFToken', csrf_token);

@@ -79,25 +79,24 @@ def get_xls(process, form_type, patient_data, intake_data):
 
 
 def get_patient_data(user):
-    p_data = []
-    p_data.append(['group', user.group])
-    p_data.append(['patient_id', user.patient_id])
-    p_data.append(['sessions', user.sessions])
-    p_data.append(['initial_intake', user.initial_intake])
-    p_data.append(['date_of_birth', user.date_of_birth])
-    p_data.append(['guardian_names', user.guardian_names])
-    p_data.append(['custody', user.custody])
-    p_data.append(['gender', user.gender])
-    p_data.append(['address', user.address])
-    p_data.append(['phone', user.phone])
-    p_data.append(['email', user.email])
-    p_data.append(['handed', user.handed])
-    p_data.append(['diagnosis', user.diagnosis])
-    p_data.append(['reason_for_treatment', user.reason_for_treatment])
-    p_data.append(['current_medication', user.current_medication])
-    p_data.append(['previous_medication', user.previous_medication])
-    p_data.append(['referral', user.referral])
-    return p_data
+    return [['group', user.group],
+              ['patient_id', user.patient_id],
+              ['sessions', user.sessions],
+              ['initial_intake', user.initial_intake],
+              ['date_of_birth', user.date_of_birth],
+              ['guardian_names', user.guardian_names],
+              ['custody', user.custody],
+              ['gender', user.gender],
+              ['address', user.address],
+              ['phone', user.phone],
+              ['email', user.email],
+              ['handed', user.handed],
+              ['diagnosis', user.diagnosis],
+              ['reason_for_treatment', user.reason_for_treatment],
+              ['current_medication', user.current_medication],
+              ['previous_medication', user.previous_medication],
+              ['referral', user.referral]
+            ]
 
 
 def get_intake_data(user):

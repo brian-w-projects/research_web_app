@@ -34,7 +34,6 @@ $(function(){
 
    $removeRow.on('click', function(){
       if(current !== 0){
-          console.log(current);
           current--;
           $('#'+current+'-protocol-type').prop('disabled', false).selectpicker('refresh');
           $('#row-' + current).hide();
@@ -53,7 +52,7 @@ $(function(){
             type: 'POST',
             contentType: 'application/json;charset=UTF-8',
             url: submitData,
-            data: JSON.stringify($form.serializeArray()),
+            data: JSON.stringify($form.find(':input:not(:hidden)').serializeArray()),
             beforeSend: function(xhr, settings){
                 if(!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain){
                     xhr.setRequestHeader('X-CSRFToken', csrf_token);

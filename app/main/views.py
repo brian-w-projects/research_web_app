@@ -26,9 +26,6 @@ def index():
                 s = TimedSerializer(current_app.config['SECRET_KEY'], 1800)
                 session['token'] = s.dumps({'auth': clean(patient_id)})
                 session['name'] = first_name + ' ' + last_name
-                if user.date_of_birth is None:
-                    session['intake_page'] = 0
-                    return redirect(url_for('main.general_information'))
                 return redirect(url_for('main.begin'))
         flash(u'Please check entered data.', 'error')
         return redirect(url_for('main.index'))
@@ -57,12 +54,13 @@ def begin(single_user):
                     Form.section != None) \
             .order_by(desc(Form.date)) \
             .all()
-        if len(assessments) == 0:
+        if len(assessments) == 0 and single_user.intake_page is None:
             session.clear()
             flash(u'You do not have any assessments to fill out at this time', 'error')
             return redirect(url_for('main.index'))
         to_display = [(a.id, datetime.strftime(a.date, '%b %d, %Y')) for a in assessments]
-        return render_template('main/begin.html', assessments=to_display, form=form)
+        return render_template('main/begin.html', assessments=to_display, form=form,
+                               intake=single_user.intake_page is not None)
 
 
 @main.route('/form')
@@ -109,8 +107,6 @@ def process(single_user):
             current_form.section += 1
         elif data[question] is False:
             current_form.section -= 1
-            if current_form.section < 0:
-                current_form.section = 0
         else:
             update_question = Question.query\
                 .filter(Question.form_id == current_form.id,
@@ -171,6 +167,12 @@ def finish(single_user):
 @main.route('/general_information', methods=['GET', 'POST'])
 @token_required
 def general_information(single_user):
+    if single_user.date_of_birth is not None:
+        if single_user.intake_page is None:
+            flash(u'You have already filled this form out', 'error')
+            return redirect(url_for('main.index'))
+        else:
+            return redirect(url_for('main.intake'))
     if request.method == 'POST':
         process = request.form
         single_user.date_of_birth = process['1']
@@ -196,7 +198,7 @@ def general_information(single_user):
 @main.route('/intake', methods=['GET', 'POST'])
 @token_required
 def intake(single_user):
-    page = session['intake_page']
+    page = single_user.intake_page
     questions = Intake.get_intake_questions()
     buffer = sum([len(questions[s]) for s in range(0, page)])
     if request.method == 'POST':
@@ -206,10 +208,15 @@ def intake(single_user):
                             details=request.form[(str(i+buffer))+ " n"])
             db.session.add(to_add)
             db.session.commit()
-        session['intake_page'] += 1
+        single_user.intake_page += 1
+        db.session.add(single_user)
+        db.session.commit()
         page += 1
         buffer = sum([len(questions[s]) for s in range(0, page)])
-    if session['intake_page'] >= len(questions):
+    if single_user.intake_page >= len(questions):
+        single_user.intake_page = None
+        db.session.add(single_user)
+        db.session.commit()
         return redirect(url_for('main.intake_finish'))
     return render_template('main/intake_form.html', questions=questions[page],
                            complete=(page+1)*100//len(questions),
@@ -221,11 +228,3 @@ def intake(single_user):
 def intake_finish(single_user):
     session.clear()
     return render_template('main/intake_finish.html')
-
-
-
-
-
-
-
-
