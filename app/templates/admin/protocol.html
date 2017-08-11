@@ -63,7 +63,8 @@
               <td>
                 <select class="selectpicker show-tick" title="Protocol Name" id="{{ i }}-protocol-name-s"
                         name="{{ i }}-protocol-name-s">
-                  {%  for ele in ('T1', 'T2', 'T3') %}
+                  {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
+                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
                     {% if last|length > i and last[i].protocol_name_1 == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
@@ -75,7 +76,8 @@
               <td>
                 <select class="selectpicker show-tick" title="Protocol Name" id="{{ i }}-protocol-name-e"
                         name="{{ i }}-protocol-name-e">
-                  {%  for ele in ('T1', 'T2', 'T3') %}
+                  {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
+                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
                     {% if last|length > i and last[i].protocol_name_2 == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
