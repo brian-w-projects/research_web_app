@@ -23,9 +23,13 @@ def index():
             if len(form_process) == 0:
                 flash(u'No data from this search', 'error')
                 return redirect(url_for('data.index'))
+            if form_process[0].user.eyes is not None:
+                filename = "{}-{}-{}".format(id, form_process[0].user.eyes, datetime.utcnow().date())
+            else:
+                filename = "{}-{}".format(id, datetime.utcnow().date())
             return excel.make_response_from_book_dict(get_xls(form_process, form_type, form.patient_data.data,
                                                               form.intake_data.data), 'xls',
-                                                      file_name=id)
+                                                      file_name=filename)
         else:
             flash(u'Please check form', 'error')
             return redirect(url_for('data.index'))

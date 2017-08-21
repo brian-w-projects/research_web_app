@@ -21,6 +21,10 @@ class Form(db.Model):
 
     user = db.relationship('User', backref=backref('form', lazy='dynamic'))
 
+    def get_title(self):
+        return ['Attention and Focus', 'Mood', 'Sleep', 'Communication and Connection', 'Energy',
+                'Physical', 'Other'][self.section]
+
     @staticmethod
     def get_questions(name):
 
@@ -81,7 +85,7 @@ class Form(db.Model):
         print('Generating Forms')
         seed()
         user_count = User.query.count()
-        form_date = datetime.utcnow() - timedelta(days=3650)
+        form_date = datetime.utcnow().date() - timedelta(days=720)
         for i in range(count):
             if i%100 == 0:
                 print('{} of {}'.format(str(i), str(count)))
@@ -95,10 +99,10 @@ class Form(db.Model):
                     .first().session+1
             except:
                 s = 1
-            name = choice(['A', 'B', 'C'])
+            name = choice(['A'])
             f = Form(patient_id=u.patient_id,
                      date=form_date, name=name, session=s)
-            u.session += 1
+            u.sessions += 1
             db.session.add(f)
             db.session.add(u)
             for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
@@ -109,7 +113,7 @@ class Form(db.Model):
                 db.session.add(q)
             db.session.commit()
             form_date = form_date + timedelta(days=randint(1, 5))
-            if form_date > datetime.utcnow():
+            if form_date > datetime.utcnow().date():
                 break
         print('{} of {}'.format(str(count), str(count)))
 
@@ -150,9 +154,10 @@ class User(db.Model):
     first_name_hash = db.Column(db.String)
     last_name_hash = db.Column(db.String)
     sessions = db.Column(db.INTEGER, default=0)
-    intake_page = db.Column(db.INTEGER, default=0, nullable=True)
+    intake_page = db.Column(db.INTEGER, default=-1, nullable=True)
     initial_intake = db.Column(db.DateTime, default=datetime.utcnow())
-    date_of_birth = db.Column(db.String, nullable=True)
+    date_of_birth = db.Column(db.DateTime, nullable=True)
+    eyes = db.Column(db.String, nullable=True)
     guardian_names = db.Column(db.String, nullable=True)
     custody = db.Column(db.String, nullable=True)
     gender = db.Column(db.String, nullable=True)
@@ -187,7 +192,7 @@ class User(db.Model):
 
     @staticmethod
     def get_intake_questions():
-        return ['Date of Birth', 'Parents or Guardians Names', 'Custody', 'Gender', 'Address',
+        return ['Parents or Guardians Names', 'Custody', 'Gender', 'Address',
                  'Phone Number', 'Email Address', 'Handed (left, right or both)', 'Previous and current diagnosis',
                 'Reason for Treatment', 'Current Medication (generic name, dosage, time of day)',
                 'Previous Medication (generic name, dosage, time of day)', 'Source of Referral']
@@ -203,21 +208,15 @@ class User(db.Model):
                 print('{} of {}'.format(str(i), str(count)))
             first = forgery_py.name.first_name().strip().lower()
             last = forgery_py.name.last_name().strip().lower()
-            patient_id = str(randint(1, 10000))
-            while True:
-                u = User.query.filter(User.patient_id == patient_id).first()
-                if u is None:
-                    break
-                patient_id = randint(1, 10000)
-
-            u = User(first_name=first, last_name=last, patient_id=patient_id, group=randint(1,3))
+            u = User(first_name=first, last_name=last, patient_id=str(i), group=randint(1,3),
+                     date_of_birth=datetime.strftime(forgery_py.date.date(past=True, min_delta=7000, max_delta=10000), '%m/%d/%Y'))
             db.session.add(u)
             db.session.commit()
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
         return "User(patient_id={self.patient_id}, first_name={self.first_name_hash}, " \
-               "last_name={self.last_name_hash})".format(self=self)
+               "last_name={self.last_name_hash}, phone={self.phone})".format(self=self)
 
     def __str__(self):
         return self.__repr__()
@@ -355,10 +354,13 @@ class Researcher(UserMixin, db.Model):
             email = forgery_py.internet.email_address()
             password = forgery_py.address.city()
             role = 'admin' if randint(0,20) != 19 else 'master'
-            r = Researcher(first_name=first, last_name=last, email=email, password=password,
+            try:
+                r = Researcher(first_name=first, last_name=last, email=email, password=password,
                            role=role)
-            db.session.add(r)
-            db.session.commit()
+                db.session.add(r)
+                db.session.commit()
+            except:
+                continue
         print('{} of {}'.format(str(count), str(count)))
 
 @login_manager.user_loader

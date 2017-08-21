@@ -1,19 +1,14 @@
 $(function(){
 
+    var $form = $('form');
     var $id = $('#patient_id');
     var $first = $('#first_name');
     var $last = $('#last_name');
 
-    $first.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
+    $form.formValidator();
 
-    $last.on('validate', function(evt, ret){
-        ret.val = lengthVerify(evt, 1);
-    });
-
-    $id.on('validate', function(evt, ret){
-        ret.val = lengthVerify(evt, 1);
-    });
+    $first.formRequire({'length': 1});
+    $last.formRequire({'length': 1})
+    $id.formRequire({'length': 1})
 
 });

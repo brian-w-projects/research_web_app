@@ -1,13 +1,11 @@
 $(function(){
 
+    var $form = $('form');
     var $email = $('#email');
     var $password = $('#password');
 
-    $email.on('validate', function(evt, ret){
-       ret.val = emailVerify(evt);
-    });
+    $form.formValidator();
 
-    $password.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 10);
-    });
+    $email.formRequire({'email': true});
+    $password.formRequire({'length': 10});
 });

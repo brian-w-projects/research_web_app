@@ -1,4 +1,6 @@
 $(function(){
+
+    var $form = $('form');
     var $email = $('#email');
     var $token = $('#token');
     var $firstName = $('#first_name');
@@ -7,43 +9,20 @@ $(function(){
     var $passwordConfirm = $('#password_confirm');
 
     $('[data-toogle="tooltip"]').tooltip();
-
+    $form.formValidator();
 
     $password.on('focus', function(){
         $password.parent().tooltip('show');
     }).on('blur', function(){
         $password.parent().tooltip('hide');
-    });
+    }).formRequire({'length': 10});
 
     $passwordConfirm.on('focus', function(){
         $passwordConfirm.parent().tooltip('show');
     }).on('blur', function(){
         $passwordConfirm.parent().tooltip('hide');
-    });
+    }).formRequire({'length': 10, 'equal': $password});
 
-    $token.on('validate', function(evt, ret){
-       ret.val = true;
-    });
-
-    $email.on('validate', function(evt, ret){
-       ret.val = true;
-    });
-
-    $firstName.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
-
-    $lastName.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
-
-    $password.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 10);
-    });
-
-    $passwordConfirm.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 10) &&  equalVerify(evt, $password);
-    });
-
-
+    $firstName.formRequire({'length': 1});
+    $lastName.formRequire({'length': 1});
 });

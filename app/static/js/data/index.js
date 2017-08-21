@@ -1,41 +1,15 @@
 $(function(){
+    var $form = $('form');
     var $selects = $('.selectpicker');
     var $id = $('#patient_id');
     var $formType = $('#form_type');
-    var $initial = $('#initial_data');
     var $dataRequest = $('#data_request');
-    var $patient_data = $('#patient_data');
-    var $intake_data = $('#intake_data');
-    var $submit = $('#submit');
+    var $submit = $('#submitValidate');
+
+    $form.formValidator();
 
     $selects.selectpicker('mobile').selectpicker('setStyle', 'btn-lg', 'add');
-
-    $id.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
-
-    $formType.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
-
-    $initial.on('validate', function(evt, ret){
-        ret.val = true;
-    });
-
-    $patient_data.on('validate', function(evt, ret){
-       ret.val = true;
-    });
-
-    $intake_data.on('validate', function(evt, ret){
-       ret.val = true;
-    });
-
-    $dataRequest.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-    });
-
-    $submit.on('click', function(){
-        $('.alert').hide();
-    });
-
+    $id.formRequire({'length': 1});
+    $formType.formRequire({'length': 1});
+    $dataRequest.formRequire({'length': 1});
 });

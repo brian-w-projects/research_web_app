@@ -51,7 +51,7 @@
               <td>
                 <select class="selectpicker show-tick protocol-type" title="Protocol Type" id="{{ i }}-protocol-type"
                         name="{{ i }}-protocol-type">
-                  {%  for ele in ('hrv', 'coherence', 'bipolar', 'monopolar', '2ch') %}
+                  {%  for ele in ('Bipolar', 'Coherence', 'HRV', 'Monopolar', '2ch') %}
                     {% if last|length > i and last[i].protocol_type == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
@@ -61,7 +61,7 @@
                 </select>
               </td>
               <td>
-                <select class="selectpicker show-tick" title="Protocol Name" id="{{ i }}-protocol-name-s"
+                <select class="selectpicker show-tick" title="Active" id="{{ i }}-protocol-name-s"
                         name="{{ i }}-protocol-name-s">
                   {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
                                   'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
@@ -74,7 +74,7 @@
                 </select>
               </td>
               <td>
-                <select class="selectpicker show-tick" title="Protocol Name" id="{{ i }}-protocol-name-e"
+                <select class="selectpicker show-tick" title="Reference" id="{{ i }}-protocol-name-e"
                         name="{{ i }}-protocol-name-e">
                   {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
                                   'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
@@ -96,7 +96,7 @@
                 {% endif %}
               </td>
               <td>
-                <select class="selectpicker show-tick" title="Protocol Name" id="{{ i }}-label"
+                <select class="selectpicker show-tick" title="Inhibit or Reward" id="{{ i }}-label"
                         name="{{ i }}-label">
                   {%  for ele in ('Inhibit', 'Reward') %}
                     {% if last|length > i and last[i].label == ele %}

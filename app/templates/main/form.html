@@ -9,6 +9,7 @@
   <div class="container-fluid">
     <div class="col-xs-10">
       <h1>{{ session['name'] }}</h1>
+      <h2>{{ title }}</h2>
     </div>
   </div>
   <div class="container-fluid">
@@ -27,7 +28,10 @@
               <tbody>
                 {% for question, response in questions %}
                   <tr>
-                    <td class="question">{{ question }}</td>
+                    <td class="question">
+                      {{ question }}
+                      <span class="glyphicon glyphicon-question-sign help-sign"></span>
+                    </td>
                     <td class="skip">
                       <label>
                         {% if response.intensity is none %}
@@ -87,6 +91,39 @@
         {% endif %}
       </li>
     </ul>
+  </div>
+  <div id="help">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Help</h3>
+      </div>
+      <div class="panel-body">
+        <ol>
+          <li><strong>Intensity: </strong></li>
+          <ul>
+            <li>0 = None</li>
+            <li>1 = Slight</li>
+            <li>2 = Moderate</li>
+            <li>3 = Large</li>
+            <li>4 = Extreme</li>
+          </ul>
+          <li><strong>Frequency: </strong></li>
+          <ul>
+            <li>0 = Never</li>
+            <li>1 = Occasionally</li>
+            <li>2 = Moderately</li>
+            <li>3 = Frequently</li>
+            <li>4 = Constantly</li>
+          </ul>
+          <li><strong>Change: </strong></li>
+          <ul>
+            <li>W = Worse</li>
+            <li>S = Same</li>
+            <li>B = Better</li>
+          </ul>
+        </ol>
+      </div>
+    </div>
   </div>
   <footer>
     <div class="progress">

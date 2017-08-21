@@ -1,13 +1,10 @@
 $(function(){
+   var $form = $('form');
    var $email = $('#email');
    var $token = $('#token');
 
-   $token.on('validate', function(evt, ret){
-       ret.val = lengthVerify(evt, 1);
-   });
+   $form.formValidator();
 
-   $email.on('validate', function(evt, ret){
-      ret.val = emailVerify(evt);
-   });
-
+   $token.formRequire({'length': 1});
+   $email.formRequire({'email': true});
 });

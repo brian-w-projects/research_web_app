@@ -20,6 +20,9 @@
         <li role="presentation" {% if request.path == url_for('data.index') %}class="active"{% endif %}>
           <a href="{{ url_for('data.index') }}">Retrieve Data</a>
         </li>
+        <li role="presentation" {% if request.path == url_for('admin.update_intake') %}class="active"{% endif %}>
+          <a href="{{ url_for('admin.update_intake') }}">Update Patient Intake</a>
+        </li>
         {% if current_user.is_master() %}
           <li role="presentation" {% if request.path == url_for('admin.new_researcher') %}class="active"{% endif %}>
             <a href="{{ url_for('admin.new_researcher') }}">Add Researcher</a>

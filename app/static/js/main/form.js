@@ -6,6 +6,26 @@ $(function(){
     var $selectpicker = $('.selectpicker');
     var $warning = $('#warning');
     var wide = true;
+    var $help = $('#help');
+    var $helpSign = $('.help-sign');
+
+    if($(document).width() <= 420){
+        $.each($helpSign, function(){
+            $(this).on('click', function(){
+                var left = $(this).offset().left + 20 - $(window).scrollLeft();
+                var top = $(this).offset().top + 20 - $(window).scrollTop();
+                $help.css('left', left).css('top', top).toggle();
+            });
+        });
+    }else{
+         $.each($helpSign, function(){
+            $(this).on('mouseover mouseout', function(){
+                var left = $(this).offset().left + 10 - $(window).scrollLeft();
+                var top = $(this).offset().top + 10 - $(window).scrollTop();
+                $help.css('left', left).css('top', top).toggle();
+            });
+        });
+    }
 
 
     if($(document).width() <= 1400){
@@ -60,7 +80,6 @@ $(function(){
 
         if(toSubmit){
             $warning.hide();
-            $(this).button('loading');
             $.ajax({
                 type: 'POST',
                 contentType: 'application/json;charset=UTF-8',

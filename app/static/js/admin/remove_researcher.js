@@ -1,10 +1,10 @@
 $(function(){
+
+    var $form = $('form');
     var $email = $('#email');
 
+    $form.formValidator();
 
-    $email.on('validate', function(evt, ret){
-       ret.val = emailVerify(evt);
-    });
-
+    $email.formRequire({'email': true});
 
 });

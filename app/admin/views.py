@@ -1,6 +1,7 @@
-from flask import render_template, request, flash, redirect, url_for, jsonify
+from flask import render_template, request, flash, redirect, url_for, jsonify, session
 from . import admin
-from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm, NewPasswordForm, PasswordResetForm, ProtocolForm
+from .forms import NewSessionForm, NewUserForm, NewResearcherForm, RemoveResearcherForm, \
+    NewPasswordForm, PasswordResetForm, ProtocolForm, UpdatePatientForm, GeneralIntakeForm
 from ..models import Form, User, Researcher, Protocol
 from .. import db
 from random import randint
@@ -86,6 +87,7 @@ def user():
             clean_first = clean(form.first.data).strip().lower()
             clean_last = clean(form.last.data).strip().lower()
             clean_id = clean(form.patient_id.data)
+            clean_dob = clean(form.dob.data)
             user = User.query \
                 .filter(User.patient_id == clean_id) \
                 .first()
@@ -93,7 +95,7 @@ def user():
                 flash(u'A patient with this ID has already been registered', 'error')
                 return redirect(url_for('admin.user'))
             to_add = User(first_name=clean_first, last_name=clean_last, patient_id=clean_id,
-                          group=form.group.data)
+                          group=form.group.data, date_of_birth=clean_dob)
             db.session.add(to_add)
             db.session.commit()
             flash(u"This user has been added to database", 'success')
@@ -141,6 +143,60 @@ def new_session():
     return render_template('admin/new_session.html', form=form)
 
 
+@admin.route('/test')
+def test():
+    u = User.query \
+        .filter(User.patient_id == '1') \
+        .first()
+    form = GeneralIntakeForm(obj=u)
+
+    return render_template('admin/update_general_intake.html', form=form)
+
+
+@admin.route('/update_intake', methods=['GET', 'POST'])
+@login_required
+def update_intake():
+    if request.method == 'POST':
+        if UpdatePatientForm(request.form).validate():
+            form = UpdatePatientForm(request.form)
+            clean_id = clean(form.patient_id.data)
+            clean_first= clean(form.first.data).strip().lower()
+            clean_last = clean(form.last.data).strip().lower()
+            u = User.query \
+                .filter(User.patient_id == clean_id) \
+                .first()
+            if u is not None and u.verify_name(clean_first, clean_last):
+                session['id_to_mod'] = u.patient_id
+                return redirect(url_for('admin.update_general_intake'))
+            else:
+                flash(u'This patient does not exist', 'error')
+                return redirect(url_for('admin.update_intake'))
+        else:
+            flash(u'Please check entered data', 'error')
+            return redirect(url_for('admin.update_intake'))
+    return render_template('admin/update_intake.html', form=UpdatePatientForm())
+
+
+@admin.route('/update_general_intake', methods=['GET', 'POST'])
+@login_required
+def update_general_intake():
+    if 'id_to_mod' not in session or session['id_to_mod'] is None:
+        return redirect(url_for('admin.update_intake'))
+    u = User.query \
+        .filter(User.patient_id == session['id_to_mod']) \
+        .first()
+    form = GeneralIntakeForm(obj=u)
+    if request.method == 'POST':
+        del form.patient_id
+        form.populate_obj(u)
+        db.session.add(u)
+        db.session.commit()
+        flash(u'Patient intake information successfully updated', 'success')
+        session['id_to_mod'] = None
+        return redirect(url_for('admin.update_intake'))
+    return render_template('admin/update_general_intake.html', form=form)
+
+
 @admin.route('/update_password', methods=['GET', 'POST'])
 @login_required
 def update_password():
@@ -158,7 +214,7 @@ def update_password():
                 flash(u'Please check entered data', 'error')
                 return redirect(url_for('admin.update_password'))
         else:
-            flash(u'Please check enetered data', 'error')
+            flash(u'Please check entered data', 'error')
             return redirect(url_for('admin.update_password'))
     return render_template('admin/update_password.html', form=form)
 

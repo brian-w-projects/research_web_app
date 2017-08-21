@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, session, flash, redirect, url_for, current_app
 from . import main
-from .forms import NewSessionForm, IdentifyAssessmentForm
+from .forms import NewSessionForm, IdentifyAssessmentForm, GeneralIntake
 from ..models import Form, Question, User, Intake
 from .. import db
 from decorators import token_required
@@ -16,8 +16,8 @@ def index():
     form = NewSessionForm(request.form)
     if request.method == 'POST':
         if form.validate():
-            first_name = clean(form.first_name.data)
-            last_name = clean(form.last_name.data)
+            first_name = clean(form.first_name.data).strip().lower()
+            last_name = clean(form.last_name.data).strip().lower()
             patient_id = clean(form.patient_id.data)
             user = User.query\
                 .filter(User.patient_id == patient_id)\
@@ -85,10 +85,12 @@ def form(single_user):
         .filter(Question.question.in_(question_numbers))\
         .order_by(asc(Question.question))\
         .all()
+    title = current_form.get_title()
     return render_template('main/form.html', questions=zip_longest(questions[section], responses),
                            complete=(section+1)*100//len(questions),
                            buffer=buffer,
-                           responses=responses)
+                           responses=responses,
+                           title=title)
 
 
 @main.route('/process', methods=['POST'])
@@ -167,32 +169,20 @@ def finish(single_user):
 @main.route('/general_information', methods=['GET', 'POST'])
 @token_required
 def general_information(single_user):
-    if single_user.date_of_birth is not None:
-        if single_user.intake_page is None:
-            flash(u'You have already filled this form out', 'error')
-            return redirect(url_for('main.index'))
-        else:
-            return redirect(url_for('main.intake'))
+    if single_user.intake_page is None:
+        flash(u'You have already filled this form out', 'error')
+        return redirect(url_for('main.index'))
+    elif single_user.intake_page != -1:
+        return redirect(url_for('main.intake'))
+    form = GeneralIntake(obj=single_user)
     if request.method == 'POST':
-        process = request.form
-        single_user.date_of_birth = process['1']
-        single_user.guardian_names = process['2']
-        single_user.custody = process['3']
-        single_user.gender = process['4']
-        single_user.address = process['5']
-        single_user.phone = process['6']
-        single_user.email = process['7']
-        single_user.handed = process['8']
-        single_user.diagnosis = process['9']
-        single_user.reason_for_treatment = process['10']
-        single_user.current_medication = process['11']
-        single_user.previous_medication = process['12']
-        single_user.referral = process['13']
+        del form.patient_id
+        form.populate_obj(single_user)
+        single_user.intake_page = 0
         db.session.add(single_user)
         db.session.commit()
         return redirect(url_for('main.intake'))
-    questions = User.get_intake_questions()
-    return render_template('main/general_information.html', questions=questions)
+    return render_template('main/general_information.html', form=form)
 
 
 @main.route('/intake', methods=['GET', 'POST'])
@@ -226,5 +216,8 @@ def intake(single_user):
 @main.route('/intake_finish')
 @token_required
 def intake_finish(single_user):
+    single_user.intake_page = None
+    db.session.add(single_user)
+    db.session.commit()
     session.clear()
     return render_template('main/intake_finish.html')
