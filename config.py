@@ -20,7 +20,7 @@ class DevelopmentConfig(Config):
 class DeploymentConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY') if 'SECRET_KEY' in os.environ else None
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') if 'SQLALCHEMY_DATABASE_URI' in os.environ else None
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') if 'DATABASE_URL' in os.environ else None
     # ENCRYPT_KEY = os.environ.get('ENCRYPT_KEY').encode('utf-8') if 'ENCRYPT_KEY' in os.environ else None
 
 
