@@ -54,7 +54,7 @@ $(function(){
         $(this).find(':input').filter(':visible').not(':input[type=button]').each(function(){
             if($(this).is(':submit')){
                 $(this).on('click', function(){
-                    $(this).button('loading');
+                    // $(this).button('loading');
                 });
             }else{
                 $(this).formRequire();

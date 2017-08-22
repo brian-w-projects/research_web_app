@@ -8,10 +8,10 @@ app = create_app(os.environ.get('CONFIG') or 'development')
 if __name__ == '__main__':
 
     print("This script will initialize this app's databases")
-    if input("Continue? (y/n) ") == 'y':
+    if input("Continue? (y/n)") == 'y':
         print('WARNING: If you continue all databases will be wiped!')
         print('WARNING: You will NOT be able to retrieve database information')
-        if input('Please confirm (CONFIRM) ') == 'CONFIRM':
+        if input('Please confirm (CONFIRM)') == 'CONFIRM':
             with app.app_context():
                 db.drop_all()
                 db.create_all()

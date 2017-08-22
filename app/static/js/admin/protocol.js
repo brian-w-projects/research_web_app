@@ -46,7 +46,6 @@ $(function(){
 
    $submit.on('click', function(e){
         e.preventDefault();
-        $(this).button('loading');
         $form.find(':input:disabled').removeAttr('disabled');
         $.ajax({
             type: 'POST',
