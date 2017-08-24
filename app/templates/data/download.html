@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>Download Patient Files</title>
   <link href="{{ url_for('static', filename='bootstrap-uploads/css/fileinput.css') }}"
         media="all" rel="stylesheet" type="text/css" />
@@ -17,7 +18,10 @@
           <h1 class="panel-title">Download Patient Files</h1>
         </div>
         <div class="panel-body">
-          <p>Click on the file you would like to download.</p>
+          <ul>
+            <li><h4>Submit the patient whose files you would like to see.</h4></li>
+            <li><h4>Click download for each file you want.</h4></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -40,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for file, url in files %}
+        {% for file in files %}
           <tr>
             <td>
               <h4>{{ file.filename }}</h4>
@@ -52,7 +56,7 @@
               <h4>{{ file.date }}</h4>
             </td>
             <td>
-              <a href="{{ url }}" class="btn btn-primary">
+              <a href="{{ url_for('data.serve_file', patient_id=file.patient_id, filename=file.filename) }}" class="btn btn-primary">
                 <span class="glyphicon glyphicon-download"></span>
                 Download
               </a>

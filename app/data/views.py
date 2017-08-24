@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect, url_for, Response, abort
+from flask import render_template, request, flash, redirect, url_for, Response, abort, send_from_directory
 from . import data
 from .forms import SingleDataForm, DownloadPatientForm
 from ..models import Form, Question, Intake, User, File
@@ -7,7 +7,8 @@ from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from sqlalchemy.sql.expression import or_, desc
 import flask_excel as excel
-from .. import patient, db
+from .. import patient, db, config
+import os
 
 @data.route('/', methods=['GET', 'POST'])
 @login_required
@@ -48,7 +49,7 @@ def upload():
                 patient.file_allowed(request.files['file'], request.files['file'].filename):
             file_location = patient.save(request.files.get('file'), folder=u.patient_id)
             f = File(patient_id=u.patient_id, researcher_last=current_user.last_name,
-                     filename=file_location)
+                     filename=file_location.split('/')[1])
             db.session.add(f)
             db.session.commit()
             flash(u'File uploaded', 'success')
@@ -68,9 +69,14 @@ def download():
         if u is None:
             flash(u'This patient does not exist', 'error')
             return redirect(url_for('data.download'))
-        to_ret = [(f, patient.url(f.filename)) for f in u.file]
-        return render_template('data/download.html', form=form, files=to_ret)
+        return render_template('data/download.html', form=form, files=u.file)
     return render_template('data/download.html', form=form, files='')
+
+
+@data.route('/serve_file/<patient_id>/<filename>')
+@login_required
+def serve_file(patient_id, filename):
+    return send_from_directory(config[os.environ.get('CONFIG') or 'development'].UPLOADED_PATIENT_DEST, patient_id+'/'+filename)
 
 
 def get_xls(process, form_type, patient_data, intake_data):

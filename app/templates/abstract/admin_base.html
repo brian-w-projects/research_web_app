@@ -8,36 +8,63 @@
         <li role="presentation" {% if request.path == url_for('admin.index') %}class="active"{% endif %}>
           <a href="{{ url_for('admin.index') }}">Home</a>
         </li>
-        <li role="presentation" {% if request.path == url_for('admin.user') %}class="active"{% endif %}>
-          <a href="{{ url_for('admin.user') }}">New Patient</a>
+        <li class="dropdown {% if request.path in (url_for('admin.user'), url_for('admin.new_session'),
+            url_for('admin.protocol'), url_for('admin.update_intake')) %}active{% endif %}">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Patient Options
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li role="presentation" {% if request.path == url_for('admin.user') %}class="active"{% endif %}>
+              <a href="{{ url_for('admin.user') }}">Add Patient to Database</a>
+            </li>
+            <li role="presentation" {% if request.path == url_for('admin.new_session') %}class="active"{% endif %}>
+              <a href="{{ url_for('admin.new_session') }}">Create New Appointment</a>
+            </li>
+            <li role="presentation" {% if request.path == url_for('admin.protocol') %}class="active"{% endif %}>
+              <a href="{{ url_for('admin.protocol') }}">Input Appointment Protocol Information</a>
+            </li>
+            <li role="presentation" {% if request.path == url_for('admin.update_intake') %}class="active"{% endif %}>
+              <a href="{{ url_for('admin.update_intake') }}">Update Patient Personal Information</a>
+            </li>
+          </ul>
         </li>
-        <li role="presentation" {% if request.path == url_for('admin.new_session') %}class="active"{% endif %}>
-          <a href="{{ url_for('admin.new_session') }}">New Session</a>
-        </li>
-        <li role="presentation" {% if request.path == url_for('admin.protocol') %}class="active"{% endif %}>
-          <a href="{{ url_for('admin.protocol') }}">Protocol Form</a>
-        </li>
-        <li role="presentation" {% if request.path == url_for('data.index') %}class="active"{% endif %}>
-          <a href="{{ url_for('data.index') }}">Retrieve Data</a>
-        </li>
-        <li role="presentation" {% if request.path == url_for('data.upload') %}class="active"{% endif %}>
-          <a href="{{ url_for('data.upload') }}">Upload Patient Files</a>
-        </li>
-        <li role="presentation" {% if request.path == url_for('data.download') %}class="active"{% endif %}>
-          <a href="{{ url_for('data.download') }}">Download Patient Files</a>
-        </li>
-        <li role="presentation" {% if request.path == url_for('admin.update_intake') %}class="active"{% endif %}>
-          <a href="{{ url_for('admin.update_intake') }}">Update Patient Intake</a>
+        <li class="dropdown {% if request.path in (url_for('data.index'), url_for('data.download'),
+            url_for('data.upload')) %}active{% endif %}">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Patient Data Options
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li role="presentation" {% if request.path == url_for('data.index') %}class="active"{% endif %}>
+              <a href="{{ url_for('data.index') }}">Retrieve Patient Assessment Data</a>
+            </li>
+            <li role="presentation" {% if request.path == url_for('data.upload') %}class="active"{% endif %}>
+              <a href="{{ url_for('data.upload') }}">Upload Patient Files</a>
+            </li>
+            <li role="presentation" {% if request.path == url_for('data.download') %}class="active"{% endif %}>
+              <a href="{{ url_for('data.download') }}">Download Patient Files</a>
+            </li>
+          </ul>
         </li>
         {% if current_user.is_master() %}
-          <li role="presentation" {% if request.path == url_for('admin.new_researcher') %}class="active"{% endif %}>
-            <a href="{{ url_for('admin.new_researcher') }}">Add Researcher</a>
-          </li>
-          <li role="presentation" {% if request.path == url_for('admin.remove_researcher') %}class="active"{% endif %}>
-            <a href="{{ url_for('admin.remove_researcher') }}">Remove Researcher</a>
-          </li>
-          <li role="presentation" {% if request.path == url_for('admin.reset_password') %}class="active"{% endif %}>
-            <a href="{{ url_for('admin.reset_password') }}">Reset Researcher Password</a>
+          <li class="dropdown {% if request.path in (url_for('admin.new_researcher'), url_for('admin.remove_researcher'),
+            url_for('admin.reset_password')) %}active{% endif %}">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              Researcher/Volunteer Options
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li role="presentation" {% if request.path == url_for('admin.new_researcher') %}class="active"{% endif %}>
+                <a href="{{ url_for('admin.new_researcher') }}">Add Researcher</a>
+              </li>
+              <li role="presentation" {% if request.path == url_for('admin.remove_researcher') %}class="active"{% endif %}>
+                <a href="{{ url_for('admin.remove_researcher') }}">Remove Researcher</a>
+              </li>
+              <li role="presentation" {% if request.path == url_for('admin.reset_password') %}class="active"{% endif %}>
+                <a href="{{ url_for('admin.reset_password') }}">Reset Researcher Password</a>
+              </li>
+            </ul>
           </li>
         {% endif %}
         <li role="presentation" {% if request.path == url_for('admin.update_password') %}class="active"{% endif %}>

@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>Upload Patient Files</title>
   <link href="{{ url_for('static', filename='bootstrap-uploads/css/fileinput.css') }}"
         media="all" rel="stylesheet" type="text/css" />
@@ -17,7 +18,11 @@
           <h1 class="panel-title">Upload Files Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to upload patient data for storage.</p>
+          <ul>
+            <li><h4>Use this form to upload patient data for storage.</h4></li>
+            <li><h4>Indicate the patient this file is for and select the
+              file</h4></li>
+          </ul>
         </div>
       </div>
     </div>

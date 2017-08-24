@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>New Protocol Form</title>
   <link href="{{ url_for('static', filename='css/admin/protocol.css') }}" rel="stylesheet">
 {% endblock %}
@@ -15,7 +16,12 @@
           <h1 class="panel-title">New Protocol Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to select a session to enter protocols.</p>
+          <ul>
+            <li><h4>Use this form to select a session to enter protocols.</h4></li>
+            <li><h4>A protocol form must be created for each patient session.</h4></li>
+            <li><h4>This form load the most recent protocol information available.</h4></li>
+            <li><h4>Patient ID must be entered before assessment dates are loaded.</h4></li>
+          </ul>
         </div>
       </div>
     </div>

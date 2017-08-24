@@ -391,8 +391,7 @@ class Researcher(UserMixin, db.Model):
             password = forgery_py.address.city()
             role = 'admin' if randint(0,20) != 19 else 'master'
             try:
-                r = Researcher(first_name=first, last_name=last, email=email, password=password,
-                           role=role)
+                r = Researcher(first_name=first, last_name=last, email=email, password=password, role=role)
                 db.session.add(r)
                 db.session.commit()
             except:

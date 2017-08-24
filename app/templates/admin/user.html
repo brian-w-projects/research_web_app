@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>New User</title>
   <link href="{{ url_for('static', filename='bootstrap/css/jtsage-datebox.min.css') }}" rel="stylesheet"/>
 {% endblock %}
@@ -15,7 +16,12 @@
           <h1 class="panel-title">New Patient Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to add a new patient to the database.</p>
+          <ul>
+            <li><h4>Use this form to add a new patient to the database.</h4></li>
+            <li><h4>You must fill out each option to complete the form.</h4></li>
+            <li><h4>This form only needs to be filled out once per patient.</h4></li>
+            <li><h4>A patient may not be added to the site more than once.</h4></li>
+          </ul>
         </div>
       </div>
     </div>

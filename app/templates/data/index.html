@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>Data Request</title>
   <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-datepicker.min.css') }}" rel="stylesheet"/>
 {% endblock %}
@@ -15,7 +16,16 @@
           <h1 class="panel-title">Data Request Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to download patient data.</p>
+          <ul><h4>Use this form to download patient data.</h4></ul>
+          <ul><h4>Select the options for download and click sumit</h4></ul>
+          <ul><h4><b>Initial Assessment Data:</b> This option will include the first self assessment the patient
+            filled out.</h4></ul>
+          <ul><h4><b>Patient Information:</b> This option will include date-of-birth, phone number and other
+            patient information</h4></ul>
+          <ul><h4><b>Intake Information:</b> This option will include patient's intake information,
+            if filled out</h4></ul>
+          <ul><h4><b>Data Request:</b> Select with assessments you want</h4></ul>
+          <ul><h4><b>Form:</b> Select the type of assessment needed</h4></ul>
         </div>
       </div>
     </div>

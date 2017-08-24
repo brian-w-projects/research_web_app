@@ -113,14 +113,12 @@ def new_session():
     if request.method == 'POST':
         if form.validate():
             clean_id = clean(form.patient_id.data)
-            clean_first = clean(form.first.data).strip().lower()
-            clean_last = clean(form.last.data).strip().lower()
             clean_date = clean(form.date.data)
             clean_form_type = clean(form.form_name.data)
             user = User.query \
                 .filter(User.patient_id == clean_id) \
                 .first()
-            if user is None or not user.verify_name(clean_first, clean_last):
+            if user is None:
                 flash(u'This user does not exist. Either add them to system or check data', 'error')
                 return redirect(url_for('admin.new_session'))
             assessment = Form.query \
@@ -168,12 +166,10 @@ def update_intake():
         if UpdatePatientForm(request.form).validate():
             form = UpdatePatientForm(request.form)
             clean_id = clean(form.patient_id.data)
-            clean_first= clean(form.first.data).strip().lower()
-            clean_last = clean(form.last.data).strip().lower()
             u = User.query \
                 .filter(User.patient_id == clean_id) \
                 .first()
-            if u is not None and u.verify_name(clean_first, clean_last):
+            if u is not None:
                 session['id_to_mod'] = u.patient_id
                 return redirect(url_for('admin.update_general_intake'))
             else:

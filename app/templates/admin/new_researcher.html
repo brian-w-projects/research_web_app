@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>New Researcher</title>
 {% endblock %}
 
@@ -14,7 +15,14 @@
           <h1 class="panel-title">New Researcher Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to add a new researcher.</p>
+          <ul>
+            <li><h4>Use this form to add a new researcher.</h4></li>
+            <li><h4>Provide the new researcher with the generated token. The can
+              use this token to register for the site.</h4></li>
+            <li><h4>Below you will find all researchers who have not registered
+              for an account. For security purposes, these should either be registered
+              or deleted. </h4></li>
+          </ul>
         </div>
         <div class="alert alert-danger">
           WARNING: This person will have full access to the patient database!

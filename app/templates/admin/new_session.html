@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>New Session</title>
   <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-datepicker.min.css') }}" rel="stylesheet"/>
 {% endblock %}
@@ -15,14 +16,17 @@
           <h1 class="panel-title">New Assessment Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to add a new assessment for a patient.</p>
+          <ul>
+            <li><h4>Use this form to add a new assessment for a patient.</h4></li>
+            <li><h4>You can select any date past or present for a session.</h4></li>
+            <li><h4>There may only be one session per day.</h4></li>
+            <li><h4>You can view scheduled assessments below.</h4></li>
+          </ul>
         </div>
       </div>
     </div>
     <form id='form1' method="POST">
       {{ macros.form_element('fa fa-id-card', form.patient_id(class='form-control', placeholder='Patient ID')) }}
-      {{ macros.form_element('glyphicon glyphicon-user', form.first(class='form-control', placeholder='First Name')) }}
-      {{ macros.form_element('glyphicon glyphicon-user', form.last(class='form-control', placeholder='Last Name')) }}
       {{ macros.form_element('glyphicon glyphicon-calendar', form.date(class='form-control', placeholder='Date', type='text', id='date')) }}
       {{ macros.select_element('Assessment', form.form_name, 'form_name') }}
       {{ form.csrf_token() }}
@@ -38,7 +42,12 @@
           <h1 class="panel-title">View or Delete Upcoming Sessions Form</h1>
         </div>
         <div class="panel-body">
-          <p>Use this form to view or delete upcoming patient sessions.</p>
+          <ul>
+            <li><h4>Use this form to view or delete upcoming patient sessions.</h4></li>
+            <li><h4>You can delete sessions by checking the appropriate session.</h4></li>
+            <li><h4>Only sessions that have not had assessments filled out by patients
+              can be deleted.</h4></li>
+          </ul>
         </div>
       </div>
     </div>

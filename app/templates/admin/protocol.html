@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>New Protocol Form</title>
   <link href="{{ url_for('static', filename='css/admin/protocol.css') }}" rel="stylesheet">
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'abstract/admin_base.html' %}
 
 {% block header %}
+  {{ super() }}
   <title>Admin Home</title>
 {% endblock %}
 
@@ -8,14 +9,59 @@
   {{ super() }}
   <div class="container-fluid">
     <div class="col-xs-offset-1 col-xs-10">
-      <div class="panel panel-primary">
+      <div class="panel panel-warning">
         <div class="panel-heading">
           <h1 class="panel-title">Welcome {{ current_user.first_name|title }} {{ current_user.last_name|title }}</h1>
         </div>
         <div class="panel-body">
           <ul>
-            <li>Select the action you would like to take above</li>
-            <li>Be sure to log out when you are finished</li>
+            <li><h4>Below you will find descriptions of all the available options</h4></li>
+            <li><h4>Be sure to log out when you are finished</h4></li>
+            <li><h4><b>Patient Options:</b></h4></li>
+              <ol>
+                <li>
+                  <h4><b>Add Patient to Database:</b> Add a new patient to this site. This only needs to be done
+                  once per patient.</h4>
+                </li>
+                <li>
+                  <h4><b>Create New Appointment:</b> Add an appointment for a patient. This allows a patient to
+                    fill out an assessment. You can also view and delete appointments</h4>
+                </li>
+                <li>
+                  <h4><b>Input Appointment Protocol Information:</b> Create protocol information for each
+                    patient's appointments.</h4></li>
+                <li><h4><b>Update Patient Personal Information:</b> View and modify patient's contact and
+                  personal information.</h4></li>
+              </ol>
+            <li><h4><b>Patient Data Options</b></h4></li>
+              <ol>
+                <li>
+                  <h4><b>Retrieve Patient Assessment Data:</b>Download all patient assessment information.</h4>
+                </li>
+                <li>
+                  <h4><b>Upload Patient Files:</b> Upload and store any files related to a patient</h4>
+                </li>
+                <li>
+                  <h4><b>Download Patient Files:</b> Download any files related to a patient</h4>
+                </li>
+              </ol>
+            {% if current_user.is_master() %}
+              <li><h4><b>Researcher/Volunteer Options</b></h4></li>
+                <ol>
+                  <li>
+                    <h4><b>Add Researcher:</b> Add a new researcher to this site.</h4>
+                  </li>
+                  <li>
+                    <h4><b>Remove Researcher:</b> Remove a researcher from this site.</h4>
+                  </li>
+                  <li>
+                    <h4><b>Reset Researcher Password:</b> Reset a researcher password. Use this if a researcher
+                      has forgotten their password.</h4>
+                  </li>
+                </ol>
+            {% endif %}
+            <li><h4><b>Update Password:</b> Update your password</h4></li>
+            <li><h4><b>Logout:</b> Log out of site</h4></li>
           </ul>
         </div>
       </div>

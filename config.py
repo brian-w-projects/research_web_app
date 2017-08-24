@@ -14,7 +14,7 @@ class DevelopmentConfig(Config):
     SECRET_KEY = 'asdlfasdflkjsdf'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = 'postgresql://brian:secret@localhost/brian'
-    UPLOADED_PATIENT_DEST = os.path.abspath(os.path.join(os.path.dirname(__file__),'patient_files'))
+    UPLOADED_PATIENT_DEST = os.path.abspath(os.path.join(os.path.dirname(__file__), 'patient_files'))
     # ENCRYPT_KEY = b'gv37r0qv6EGKcRJz64QOzct578GDISQlEgTmZrhOB7E='
 
 

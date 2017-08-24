@@ -4,8 +4,6 @@ from wtforms import validators, StringField, SubmitField, DateField, SelectField
 
 class NewSessionForm(FlaskForm):
     patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
-    first = StringField('First Name', validators=[validators.DataRequired()])
-    last = StringField('Last Name', validators=[validators.DataRequired()])
     date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
     form_name = SelectField('Select Data', choices=[('A', 'Session Self Report')],
                             validators=[validators.DataRequired()])
@@ -14,8 +12,6 @@ class NewSessionForm(FlaskForm):
 
 class UpdatePatientForm(FlaskForm):
     patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
-    first = StringField('First Name', validators=[validators.DataRequired()])
-    last = StringField('Last Name', validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 
 
