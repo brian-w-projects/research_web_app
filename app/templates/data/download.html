@@ -1,0 +1,71 @@
+{% extends 'abstract/admin_base.html' %}
+
+{% block header %}
+  <title>Download Patient Files</title>
+  <link href="{{ url_for('static', filename='bootstrap-uploads/css/fileinput.css') }}"
+        media="all" rel="stylesheet" type="text/css" />
+
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  {{ macros.flashed_messages(get_flashed_messages(with_categories=true)) }}
+  <div class="container-fluid">
+    <div class="col-xs-offset-1 col-xs-10">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">Download Patient Files</h1>
+        </div>
+        <div class="panel-body">
+          <p>Click on the file you would like to download.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form method="POST">
+    {{ macros.form_element('fa fa-id-card', form.patient_id(class='form-control', placeholder='Patient ID')) }}
+    {{ form.csrf_token() }}
+    {{ macros.submit_element() }}
+  </form>
+  <br/>
+  <br/>
+  <div class="container-fluid">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Uploader</th>
+          <th>Date</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for file, url in files %}
+          <tr>
+            <td>
+              <h4>{{ file.filename }}</h4>
+            </td>
+            <td>
+              <h4>{{ file.researcher_last }}</h4>
+            </td>
+            <td>
+              <h4>{{ file.date }}</h4>
+            </td>
+            <td>
+              <a href="{{ url }}" class="btn btn-primary">
+                <span class="glyphicon glyphicon-download"></span>
+                Download
+              </a>
+            </td>
+          </tr>
+        {%  endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='bootstrap-uploads/js/fileinput.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap-uploads/themes/fa/theme.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/data/download.js') }}"></script>
+{% endblock %}

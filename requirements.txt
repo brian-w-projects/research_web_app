@@ -10,6 +10,7 @@ Flask-Login==0.4.0
 Flask-Moment==0.5.1
 Flask-SQLAlchemy==2.2
 Flask-SSLify==0.1.5
+Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 ForgeryPy==0.1
 gunicorn==19.7.1

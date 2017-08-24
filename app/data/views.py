@@ -1,13 +1,13 @@
-from flask import render_template, request, flash, redirect, url_for, Response
+from flask import render_template, request, flash, redirect, url_for, Response, abort
 from . import data
-from .forms import SingleDataForm
-from ..models import Form, Question, Intake
+from .forms import SingleDataForm, DownloadPatientForm
+from ..models import Form, Question, Intake, User, File
 from bleach import clean
-from flask_login import login_required
+from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from sqlalchemy.sql.expression import or_, desc
 import flask_excel as excel
-
+from .. import patient, db
 
 @data.route('/', methods=['GET', 'POST'])
 @login_required
@@ -36,12 +36,49 @@ def index():
     return render_template('data/index.html', form=form)
 
 
+@data.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload():
+    if request.method == 'POST':
+        u = User.query.filter(User.patient_id == request.form['patient_id']).first()
+        if u is None:
+            flash(u'This patient does not exist', 'error')
+            return redirect(url_for('data.upload'))
+        if 'file' in request.files and \
+                patient.file_allowed(request.files['file'], request.files['file'].filename):
+            file_location = patient.save(request.files.get('file'), folder=u.patient_id)
+            f = File(patient_id=u.patient_id, researcher_last=current_user.last_name,
+                     filename=file_location)
+            db.session.add(f)
+            db.session.commit()
+            flash(u'File uploaded', 'success')
+            return redirect(url_for('data.upload'))
+        else:
+            flash(u'Files of this type are not allowed', 'error')
+            return redirect(url_for('data.upload'))
+    return render_template('data/upload.html')
+
+
+@data.route('/download', methods=['GET', 'POST'])
+@login_required
+def download():
+    form = DownloadPatientForm()
+    if request.method == 'POST':
+        u = User.query.filter(User.patient_id == form.patient_id.data).first()
+        if u is None:
+            flash(u'This patient does not exist', 'error')
+            return redirect(url_for('data.download'))
+        to_ret = [(f, patient.url(f.filename)) for f in u.file]
+        return render_template('data/download.html', form=form, files=to_ret)
+    return render_template('data/download.html', form=form, files='')
+
+
 def get_xls(process, form_type, patient_data, intake_data):
     to_ret = {}
     header = ['Patient', 'Group', 'Session', 'Date']
     header.extend([y for x in Form.get_questions(form_type) for y in x])
     build = [[list(header)] for x in range(4)]
-    protocol_header = ['Patient', 'Group', 'Session', 'Date', 'Researcher', 'Type', 'Name', 'Changes', 'Frequencies', 'Label', 'Duration',
+    protocol_header = ['Patient', 'Group', 'Session', 'Date', 'Researcher', 'Number', 'Type', 'Sites', 'Changes', 'Frequencies', 'Label', 'Duration',
                        'Name', 'Changes', 'Frequencies', 'Label', 'Duration', 'Notes']
     protocol = [list(protocol_header)]
     for single in process:
@@ -56,15 +93,16 @@ def get_xls(process, form_type, patient_data, intake_data):
         for protocol_line in single.protocol:
             if not append:
                 protocol_to_add = [single.patient_id, single.user.group, single.session, str(single.date)[:-9],
-                                   protocol_line.r_last_name, protocol_line.protocol_type,
-                                   protocol_line.protocol_name_1 + '-' + protocol_line.protocol_name_2,
+                                   protocol_line.r_last_name, protocol_line.number,
+                                   protocol_line.protocol_type,
+                                   protocol_line.site_1 + '-' + protocol_line.site_2,
                                    protocol_line.changes, protocol_line.frequencies, protocol_line.label,
                                    protocol_line.duration, '','','','','',protocol_line.notes]
                 protocol.append(protocol_to_add)
                 if protocol_line.protocol_type == '2ch':
                     append = True
             else:
-                second_line = [protocol_line.protocol_name_1 + '-' + protocol_line.protocol_name_2,
+                second_line = [protocol_line.site_1 + '-' + protocol_line.site_2,
                                    protocol_line.changes, protocol_line.frequencies, protocol_line.label,
                                    protocol_line.duration]
                 second_line.append(protocol[-1].pop())

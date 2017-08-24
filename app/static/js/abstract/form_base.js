@@ -51,7 +51,7 @@ $(function(){
 
 
     $.fn.formValidator = function(){
-        $(this).find(':input').filter(':visible').not(':input[type=button]').each(function(){
+        $(this).find(':input').filter(':visible').not(':input[type=button]').not('.skip').each(function(){
             if($(this).is(':submit')){
                 $(this).on('click', function(){
                     // $(this).button('loading');
@@ -62,13 +62,13 @@ $(function(){
         });
         $(this).on('input change', function(){
             var valid = true;
-            $(this).find(':input').filter(':visible').not(':input[type=button]').not(':submit').each(function(){
+            $(this).find(':input').filter(':visible').not(':input[type=button]').not(':submit').not('skip').each(function(){
                 valid = $(this).validate() && valid;
             });
             if(valid === true){
-                $(':submit').removeAttr('disabled');
+                $(this).find(':submit').removeAttr('disabled');
             }else{
-                $(':submit').attr('disabled', 'True');
+                $(this).find(':submit').attr('disabled', 'True');
             }
         });
     };

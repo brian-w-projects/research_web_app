@@ -5,6 +5,26 @@ $(function(){
    var $submit = $('#submit');
    var $form = $('form');
    var $protocolType = $('.protocol-type');
+   var $protocolNames = $('.protocol-name-e,.protocol-name-s');
+
+   $protocolNames.on('change', function(){
+       var row = $(this).attr('id').substring(0,1);
+       if(row === '0'){
+           return;
+       }
+       var currentProtocol = $('#'+row+'-protocol-name-s').val() + '-' + $('#'+row+'-protocol-name-e').val();
+       var previousProtocol = $('#'+(row-1)+'-protocol-name-s').val() + '-' +
+           $('#'+(row-1)+'-protocol-name-e').val();
+       var $previousNumber = $('#'+(parseInt(row)-1)+'-number');
+       var $currentNumber = $('#'+row+'-number');
+       if(currentProtocol !== previousProtocol){
+           $currentNumber.val(parseInt($previousNumber.val())+1);
+       }else{
+           $currentNumber.val(parseInt($previousNumber.val()));
+       }
+   });
+
+
 
    for(var i = 0; i < initialShow; i++){
        $("#row-" + i).show();

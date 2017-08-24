@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <form method="POST">
+    <form id='form1' method="POST">
       {{ macros.form_element('fa fa-id-card', form.patient_id(class='form-control', placeholder='Patient ID')) }}
       {{ macros.form_element('glyphicon glyphicon-user', form.first(class='form-control', placeholder='First Name')) }}
       {{ macros.form_element('glyphicon glyphicon-user', form.last(class='form-control', placeholder='Last Name')) }}
@@ -29,6 +29,46 @@
       {{ macros.submit_element() }}
     </form>
   </div>
+  <br/>
+  <br/>
+  <div class="container-fluid">
+    <div class="col-xs-offset-1 col-xs-10">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">View or Delete Upcoming Sessions Form</h1>
+        </div>
+        <div class="panel-body">
+          <p>Use this form to view or delete upcoming patient sessions.</p>
+        </div>
+      </div>
+    </div>
+    <form id='form2' method="POST" action="{{ url_for('admin.delete_session') }}">
+      <div class="container-fluid">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Date</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in sessions %}
+              <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td><input class='skip' name="{{ s[2] }}" type="checkbox" value="{{ s[0] }}"></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8 col-lg-offset-4 col-lg-4">
+        <input id='submit' name='submit' type="submit" value="Delete Checked Sessions"
+               class="form-control btn-info skip">
+      </div>
+    </form>
 {% endblock %}
 
 {% block scripts %}

@@ -6,6 +6,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from config import config
 import flask_excel as excel
+from flask_uploads import UploadSet, configure_uploads, patch_request_class
 
 moment = Moment()
 db = SQLAlchemy(query_class=BaseQuery)
@@ -13,6 +14,7 @@ csrf = CSRFProtect()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+patient = UploadSet('patient', ("csv","txt","doc","docx","xls","xlsx", "ods"))
 
 
 def create_app(config_name):
@@ -26,6 +28,8 @@ def create_app(config_name):
     login_manager.init_app(app)
     excel.init_excel(app)
     sslify = SSLify(app)
+    configure_uploads(app, (patient,))
+    patch_request_class(app)
 
 
     from .main import main as main_blueprint

@@ -8,6 +8,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
 from . import login_manager
 from flask_login import UserMixin
 from sqlalchemy.sql.expression import or_, desc
+import os
+from config import config
 
 
 class Form(db.Model):
@@ -101,10 +103,15 @@ class Form(db.Model):
                 s = 1
             name = choice(['A'])
             f = Form(patient_id=u.patient_id,
-                     date=form_date, name=name, session=s)
+                     date=form_date, name=name, session=s,
+                     section=None)
             u.sessions += 1
             db.session.add(f)
             db.session.add(u)
+            db.session.commit()
+            f.section = None
+            db.session.add(f)
+            db.session.commit()
             for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
                 q = Question(form=f, question=j,
                              intensity=randint(0,4), frequency=randint(0,4),
@@ -170,6 +177,7 @@ class User(db.Model):
     current_medication = db.Column(db.String, nullable=True)
     previous_medication = db.Column(db.String, nullable=True)
     referral = db.Column(db.String, nullable=True)
+    folder = db.Column(db.String, nullable=True, default=None)
 
     @property
     def first_name(self):
@@ -190,6 +198,13 @@ class User(db.Model):
     def verify_name(self, f, l):
         return check_password_hash(self.first_name_hash, f) and check_password_hash(self.last_name_hash, l)
 
+    def create_folder(self):
+        my_path = os.path.abspath(os.path.join(
+            config[os.environ.get('CONFIG') or 'development'].UPLOADED_PATIENT_DEST, self.patient_id))
+        if not os.path.exists(my_path):
+            os.makedirs(my_path)
+        self.folder=my_path
+
     @staticmethod
     def get_intake_questions():
         return ['Parents or Guardians Names', 'Custody', 'Gender', 'Address',
@@ -201,7 +216,6 @@ class User(db.Model):
     def generate_users(count):
         import forgery_py
         from random import randint
-
         print('Generating users')
         for i in range(count):
             if i%100 == 0:
@@ -212,6 +226,7 @@ class User(db.Model):
                      date_of_birth=datetime.strftime(forgery_py.date.date(past=True, min_delta=7000, max_delta=10000), '%m/%d/%Y'))
             db.session.add(u)
             db.session.commit()
+            u.create_folder()
         print('{} of {}'.format(str(count), str(count)))
 
     def __repr__(self):
@@ -229,9 +244,10 @@ class Protocol(db.Model):
     patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'), index=True)
     row = db.Column(db.INTEGER)
     r_last_name = db.Column(db.String, db.ForeignKey('researcher.last_name'), index=True)
+    number = db.Column(db.String)
     protocol_type = db.Column(db.String)
-    protocol_name_1 = db.Column(db.String)
-    protocol_name_2 = db.Column(db.String)
+    site_1 = db.Column(db.String)
+    site_2 = db.Column(db.String)
     changes = db.Column(db.BOOLEAN, default=False)
     frequencies = db.Column(db.String)
     label = db.Column(db.String)
@@ -246,7 +262,7 @@ class Protocol(db.Model):
     def __repr__(self):
         return "Protocol(patient_id={self.patient_id}, row={self.row}, " \
                "researcher={self.r_last_name}, type={self.protocol_type}, " \
-               "name={self.protocol_name_1}-{self.protocol_name_2}, frequencies={self.frequencies}, " \
+               "name={self.site_1}-{self.site_2}, frequencies={self.frequencies}, " \
                "label={self.label}, duration={self.duration}, notes={self.notes})".format(self=self)
 
     def __str__(self):
@@ -300,6 +316,26 @@ class Intake(db.Model):
 
     def __str__(self):
         return self.__repr__()
+
+
+class File(db.Model):
+    __tablename__ = 'file'
+    id = db.Column(db.INTEGER, primary_key=True)
+    patient_id = db.Column(db.String, db.ForeignKey('user.patient_id'), index=True)
+    filename = db.Column(db.String)
+    researcher_last = db.Column(db.String, db.ForeignKey('researcher.last_name'), index=True)
+    date = db.Column(db.Date, default=datetime.utcnow().date())
+
+    user = db.relationship('User', backref=backref('file', lazy='dynamic'))
+    researcher = db.relationship('Researcher', backref='file')
+
+    def __repr__(self):
+        return "File(patient_id={self.patient_id}, filename={self.filename}, " \
+               "researcher_last={self.researcher_last})".format(self=self)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class Researcher(UserMixin, db.Model):
     __tablename__ = 'researcher'

@@ -37,21 +37,31 @@
       <table id='protocol-table' class="table table-bordered table-striped">
         <thead>
           <tr>
+            <th>Protocol Number</th>
             <th>Protocol Type</th>
-            <th>Protocol 1</th>
-            <th>Protocol 2</th>
+            <th>Site 1</th>
+            <th>Site 2</th>
             <th>Frequencies</th>
             <th>I/R</th>
-            <th>Duration</th>
+            <th>Duration (mins)</th>
           </tr>
         </thead>
         <tbody>
           {% for i in range(10) %}
             <tr id="row-{{ i }}">
+              <td class="number-{{ i }}">
+                {% if last|length > i %}
+                  <input class="form-control" id="{{ i }}-number" name="{{ i }}-number"
+                       type="text" value="{{ last[i].number }}" readonly/>
+                {% else %}
+                  <input class="form-control" id="{{ i }}-number" name="{{ i }}-number"
+                       placeholder="Number" type="text" value="1" readonly/>
+                {% endif %}
+              </td>
               <td>
                 <select class="selectpicker show-tick protocol-type" title="Protocol Type" id="{{ i }}-protocol-type"
                         name="{{ i }}-protocol-type">
-                  {%  for ele in ('Bipolar', 'Coherence', 'HRV', 'Monopolar', '2ch') %}
+                  {%  for ele in ('Bipolar', 'Coherence', 'HRV', 'Monopolar', '2ch', 'n/a') %}
                     {% if last|length > i and last[i].protocol_type == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
@@ -61,11 +71,11 @@
                 </select>
               </td>
               <td>
-                <select class="selectpicker show-tick" title="Active" id="{{ i }}-protocol-name-s"
+                <select class="selectpicker show-tick protocol-name-s" title="Active" id="{{ i }}-protocol-name-s"
                         name="{{ i }}-protocol-name-s">
                   {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
-                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
-                    {% if last|length > i and last[i].protocol_name_1 == ele %}
+                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6', 'n/a') %}
+                    {% if last|length > i and last[i].site_1 == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
                       <option value="{{ ele }}">{{ ele }}</option>
@@ -74,11 +84,11 @@
                 </select>
               </td>
               <td>
-                <select class="selectpicker show-tick" title="Reference" id="{{ i }}-protocol-name-e"
+                <select class="selectpicker show-tick protocol-name-e" title="Reference" id="{{ i }}-protocol-name-e"
                         name="{{ i }}-protocol-name-e">
                   {%  for ele in ('A1', 'A2', 'C3', 'C4', 'CZ', 'F3', 'F4', 'F7', 'F8', 'FP1', 'FP2', 'FZ',
-                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6') %}
-                    {% if last|length > i and last[i].protocol_name_2 == ele %}
+                                  'O1', 'O2', 'P3', 'P4', 'PZ', 'T3', 'T4', 'T5', 'T6', 'n/a') %}
+                    {% if last|length > i and last[i].site_2 == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}
                       <option value="{{ ele }}">{{ ele }}</option>
@@ -98,7 +108,7 @@
               <td>
                 <select class="selectpicker show-tick" title="Inhibit or Reward" id="{{ i }}-label"
                         name="{{ i }}-label">
-                  {%  for ele in ('Inhibit', 'Reward') %}
+                  {%  for ele in ('Inhibit', 'Reward', 'n/a') %}
                     {% if last|length > i and last[i].label == ele %}
                       <option value="{{ ele }}" selected>{{ ele }}</option>
                     {% else %}

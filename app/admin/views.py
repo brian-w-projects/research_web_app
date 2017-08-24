@@ -96,6 +96,7 @@ def user():
                 return redirect(url_for('admin.user'))
             to_add = User(first_name=clean_first, last_name=clean_last, patient_id=clean_id,
                           group=form.group.data, date_of_birth=clean_dob)
+            to_add.create_folder()
             db.session.add(to_add)
             db.session.commit()
             flash(u"This user has been added to database", 'success')
@@ -140,17 +141,24 @@ def new_session():
         else:
             flash(u'Please fill entire form', 'error')
             return redirect(url_for('admin.new_session'))
-    return render_template('admin/new_session.html', form=form)
+    raw = Form.query \
+        .filter(Form.section != None) \
+        .order_by(Form.patient_id, Form.date) \
+        .all()
+    sessions = [(f.patient_id, str(f.date)[0:-9], f.id) for f in raw]
+    return render_template('admin/new_session.html', form=form, sessions=sessions)
 
 
-@admin.route('/test')
-def test():
-    u = User.query \
-        .filter(User.patient_id == '1') \
-        .first()
-    form = GeneralIntakeForm(obj=u)
-
-    return render_template('admin/update_general_intake.html', form=form)
+@admin.route('/delete_session', methods=['POST'])
+@login_required
+def delete_session():
+    for ele in request.form:
+        if ele not in ('csrf_token', 'submit'):
+            f = Form.query.get(ele)
+            db.session.delete(f)
+    db.session.commit()
+    flash(u'Sessions Successfully Delete', 'success')
+    return redirect(url_for('admin.new_session'))
 
 
 @admin.route('/update_intake', methods=['GET', 'POST'])
@@ -317,13 +325,14 @@ def protocol_ajax():
             .order_by(Protocol.row).all()]
     else:
         last_protocols = []
-    for i in range(2,len(data)-1,6):
+    for i in range(2,len(data)-1,7):
         if data[i]['value'] != '':
             new_protocol = Protocol(patient_id=patient_id, row=int(data[i]['name'][0]),
-                    r_last_name = current_user.last_name, protocol_type=data[i]['value'],
-                    protocol_name_1=data[i+1]['value'], protocol_name_2=data[i+2]['value'],
-                    frequencies=data[i+3]['value'], label=data[i+4]['value'],
-                    duration=data[i+5]['value'], game='filler', notes=notes if i == 2 else '',
+                    r_last_name = current_user.last_name, number=data[i]['value'],
+                    protocol_type=data[i+1]['value'],
+                    site_1=data[i+2]['value'], site_2=data[i+3]['value'],
+                    frequencies=data[i+4]['value'], label=data[i+5]['value'],
+                    duration=data[i+6]['value'], game='filler', notes=notes if i == 2 else '',
                     form_id=form_id)
             if len(last_protocols) > 0:
                 new_protocol.changes = False if last_protocols[0] == data[i+3]['value'] else True

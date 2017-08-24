@@ -16,3 +16,8 @@ class SingleDataForm(FlaskForm):
                                                        ('all', 'All records')],
                                validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
+
+
+class DownloadPatientForm(FlaskForm):
+    patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
+    submit = SubmitField('Submit')

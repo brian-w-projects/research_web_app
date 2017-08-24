@@ -20,6 +20,12 @@
         <li role="presentation" {% if request.path == url_for('data.index') %}class="active"{% endif %}>
           <a href="{{ url_for('data.index') }}">Retrieve Data</a>
         </li>
+        <li role="presentation" {% if request.path == url_for('data.upload') %}class="active"{% endif %}>
+          <a href="{{ url_for('data.upload') }}">Upload Patient Files</a>
+        </li>
+        <li role="presentation" {% if request.path == url_for('data.download') %}class="active"{% endif %}>
+          <a href="{{ url_for('data.download') }}">Download Patient Files</a>
+        </li>
         <li role="presentation" {% if request.path == url_for('admin.update_intake') %}class="active"{% endif %}>
           <a href="{{ url_for('admin.update_intake') }}">Update Patient Intake</a>
         </li>

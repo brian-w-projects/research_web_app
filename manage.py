@@ -4,7 +4,7 @@ import os
 from flask import request
 
 from app import create_app, db
-from app.models import User, Form, Question, Researcher, Protocol
+from app.models import User, Form, Question, Researcher, Protocol, File
 
 app = create_app(os.environ.get('CONFIG') or 'development')
 
