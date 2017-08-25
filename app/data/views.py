@@ -10,6 +10,7 @@ import flask_excel as excel
 from .. import patient, db, config
 import os
 
+
 @data.route('/', methods=['GET', 'POST'])
 @login_required
 def index():

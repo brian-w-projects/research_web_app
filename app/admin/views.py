@@ -123,7 +123,8 @@ def new_session():
                 return redirect(url_for('admin.new_session'))
             assessment = Form.query \
                 .filter(Form.patient_id == user.patient_id,
-                        Form.date == clean_date) \
+                        Form.date == clean_date,
+                        Form.name == clean_form_type) \
                 .first()
             if assessment is not None:
                 flash(u'This patient already has a session scheduled for this day', 'error')
@@ -143,7 +144,9 @@ def new_session():
         .filter(Form.section != None) \
         .order_by(Form.patient_id, Form.date) \
         .all()
-    sessions = [(f.patient_id, str(f.date)[0:-9], f.id) for f in raw]
+    form_names = {'A': 'Session Self Report', 'B': 'Symptoms and Cortical Networks',
+                 'C': 'Arousal Assessment', 'D': 'Major Self Report'}
+    sessions = [(f.patient_id, str(f.date)[0:-9], f.id, form_names[f.name]) for f in raw]
     return render_template('admin/new_session.html', form=form, sessions=sessions)
 
 

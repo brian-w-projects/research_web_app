@@ -5,7 +5,8 @@ from wtforms import validators, StringField, SubmitField, DateField, SelectField
 class NewSessionForm(FlaskForm):
     patient_id = StringField('Patient ID', validators=[validators.DataRequired()])
     date = DateField('Date of Session ', format='%m/%d/%Y', validators=[validators.DataRequired()])
-    form_name = SelectField('Select Data', choices=[('A', 'Session Self Report')],
+    form_name = SelectField('Select Data', choices=[('A', 'Session Self Report'), ('B', 'Symptoms and Cortical Networks'),
+                                                    ('C', 'Arousal Assessment'), ('D', 'Major Self Report')],
                             validators=[validators.DataRequired()])
     submit = SubmitField('Submit')
 

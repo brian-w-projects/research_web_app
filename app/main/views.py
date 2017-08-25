@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, session, flash, redirect, url_for, current_app
 from . import main
 from .forms import NewSessionForm, IdentifyAssessmentForm, GeneralIntake
-from ..models import Form, Question, User, Intake
+from ..models import Form, Question, User, Intake, Cortical, Arousal, Major
 from .. import db
 from decorators import token_required
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
@@ -44,7 +44,14 @@ def begin(single_user):
                 return redirect(url_for('main.begin'))
             else:
                 session['form'] = single_assessment.id
-                return redirect(url_for('main.form'))
+                if single_assessment.name == 'A':
+                    return redirect(url_for('main.form'))
+                elif single_assessment.name == 'B':
+                    return redirect(url_for('main.cortical'))
+                elif single_assessment.name == 'C':
+                    return redirect(url_for('main.arousal'))
+                else:
+                    return redirect(url_for('main.major'))
         else:
             flash(u'Please check form entry', 'error')
             return redirect(url_for('main.begin'))
@@ -58,7 +65,9 @@ def begin(single_user):
             session.clear()
             flash(u'You do not have any assessments to fill out at this time', 'error')
             return redirect(url_for('main.index'))
-        to_display = [(a.id, datetime.strftime(a.date, '%b %d, %Y')) for a in assessments]
+        form_names = {'A': 'Session Self Report', 'B': 'Symptoms and Cortical Networks',
+                      'C': 'Arousal Assessment', 'D': 'Major Self Report'}
+        to_display = [(a.id, datetime.strftime(a.date, '%b %d, %Y')+' -- '+form_names[a.name]) for a in assessments]
         return render_template('main/begin.html', assessments=to_display, form=form,
                                intake=single_user.intake_page is not None)
 
@@ -75,7 +84,7 @@ def form(single_user):
         flash(u'There has been an error', 'error')
         return redirect(url_for('main.index'))
     section = current_form.section
-    questions = Form.get_questions(current_form.name)
+    questions = current_form.get_questions()
     if section >= len(questions):
         return redirect(url_for('main.finish'))
     buffer = sum([len(questions[s]) for s in range(0,section)])
@@ -221,3 +230,104 @@ def intake_finish(single_user):
     db.session.commit()
     session.clear()
     return render_template('main/intake_finish.html')
+
+
+@main.route('/cortical', methods=['GET', 'POST'])
+@token_required
+def cortical(single_user):
+    if 'form' not in session:
+        session.clear()
+        flash(u'Your session has expired', 'error')
+        return redirect(url_for('main.index'))
+    current_form = Form.query.get(session['form'])
+    if current_form is None:
+        flash(u'There has been an error', 'error')
+        return redirect(url_for('main.index'))
+    section = current_form.section
+    questions = current_form.get_questions()
+    if section >= len(questions):
+        return redirect(url_for('main.finish'))
+    buffer = sum([len(questions[s]) for s in range(0,section)])
+    title = current_form.get_title()
+    if request.method == 'POST':
+        for i in range(1, len(questions[current_form.section]) + 1):
+            to_add = Cortical(form_id=current_form.id, question=i+buffer,
+                              response=request.form[str((i+buffer))+' '] if str((i+buffer))+' ' in request.form else '')
+            db.session.add(to_add)
+            db.session.commit()
+        current_form.section += 1
+        db.session.add(current_form)
+        db.session.commit()
+        return redirect(url_for('main.cortical'))
+    return render_template('main/cortical.html', questions=questions[section],
+                           complete=(section+1)*100//len(questions),
+                           buffer=buffer,
+                           title=title)
+
+
+@main.route('/arousal', methods=['GET', 'POST'])
+@token_required
+def arousal(single_user):
+    if 'form' not in session:
+        session.clear()
+        flash(u'Your session has expired', 'error')
+        return redirect(url_for('main.index'))
+    current_form = Form.query.get(session['form'])
+    if current_form is None:
+        flash(u'There has been an error', 'error')
+        return redirect(url_for('main.index'))
+    section = current_form.section
+    questions = current_form.get_questions()
+    if section >= len(questions):
+        return redirect(url_for('main.finish'))
+    buffer = sum([len(questions[s]) for s in range(0,section)])
+    title = current_form.get_title()
+    if request.method == 'POST':
+        for i in range(1, len(questions[current_form.section]) + 1):
+            to_add = Arousal(form_id=current_form.id, question=i+buffer,
+                              response=request.form[str((i+buffer))+' '] if str((i+buffer))+' ' in request.form else '')
+            db.session.add(to_add)
+            db.session.commit()
+            print(to_add)
+        current_form.section += 1
+        db.session.add(current_form)
+        db.session.commit()
+        return redirect(url_for('main.arousal'))
+    return render_template('main/arousal.html', questions=questions[section],
+                           complete=(section+1)*100//len(questions),
+                           buffer=buffer,
+                           title=title)
+
+
+@main.route('/major', methods=['GET', 'POST'])
+@token_required
+def major(single_user):
+    if 'form' not in session:
+        session.clear()
+        flash(u'Your session has expired', 'error')
+        return redirect(url_for('main.index'))
+    current_form = Form.query.get(session['form'])
+    if current_form is None:
+        flash(u'There has been an error', 'error')
+        return redirect(url_for('main.index'))
+    section = current_form.section
+    questions = current_form.get_questions()
+    if section >= len(questions):
+        return redirect(url_for('main.finish'))
+    buffer = sum([len(questions[s]) for s in range(0,section)])
+    title = current_form.get_title()
+    if request.method == 'POST':
+        for i in range(1, len(questions[current_form.section]) + 1):
+            to_add = Major(form_id=current_form.id, question=i+buffer,
+                  response=request.form[str((i+buffer))+' '] if str((i+buffer))+' ' in request.form else '')
+            db.session.add(to_add)
+            db.session.commit()
+            print(to_add)
+        current_form.section += 1
+        db.session.add(current_form)
+        db.session.commit()
+        return redirect(url_for('main.major'))
+    return render_template('main/major.html', questions=questions[section],
+                           complete=(section+1)*100//len(questions),
+                           buffer=buffer,
+                           title=title)

@@ -58,6 +58,7 @@
             <tr>
               <th>Patient ID</th>
               <th>Date</th>
+              <th>Form</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -66,6 +67,7 @@
               <tr>
                 <td>{{ s[0] }}</td>
                 <td>{{ s[1] }}</td>
+                <td>{{ s[3] }}</td>
                 <td><input class='skip' name="{{ s[2] }}" type="checkbox" value="{{ s[0] }}"></td>
               </tr>
             {% endfor %}

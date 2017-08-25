@@ -7,7 +7,9 @@ class SingleDataForm(FlaskForm):
     initial_data = BooleanField('Initial Data')
     patient_data = BooleanField('Patient Data')
     intake_data = BooleanField('Intake Data')
-    form_type = SelectField('Select Form', choices=[('A', 'Session Self Report')],
+    form_type = SelectField('Select Form', choices=[('A', 'Session Self Report'),
+                                                    ('B', 'Symptoms and Cortical Networks'),
+                                                    ('C', 'Arousal Assessment'), ('D', 'Major Self Report')],
                             validators=[validators.DataRequired()])
     data_request = SelectField('Select Data', choices=[('5', '5 most recent'), ('10', '10 most recent'),
                                                        ('15', '15 most recent'), ('20', '20 most recent'),

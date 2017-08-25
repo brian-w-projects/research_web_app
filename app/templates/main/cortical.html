@@ -1,0 +1,89 @@
+{% extends 'abstract/base.html' %}
+
+{% block header %}
+  <title>Form -- page {{ section }}</title>
+  <link href="{{ url_for('static', filename='css/main/form.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/main/cortical.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="col-xs-10">
+      <h1>{{ session['name'] }}</h1>
+      <h2>{{ title }}</h2>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <form method="POST">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Not Applicable</th>
+                <th>Response</th>
+              </tr>
+            </thead>
+              <tbody>
+                {% for question in questions %}
+                  <tr>
+                    <td class="question">
+                      {{ question }}
+                      <span class="glyphicon glyphicon-question-sign help-sign"></span>
+                    </td>
+                    <td class="skip">
+                      <label>
+                        <input name='{{ loop.index + buffer }}' type="checkbox" value="skip"/>
+                        Not Applicable
+                      </label>
+                    </td>
+                    <td>
+                      {{ macros.radio_macro('', loop.index + buffer, -1) }}
+                      {{ macros.select_macro('', loop.index + buffer, -1) }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="container-fluid" id="warning">
+          <div class="col-xs-10 col-xs-offset-1">
+            <div class="alert alert-danger" role="alert">
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              Please ensure you have answered every question or marked them N/A.
+            </div>
+          </div>
+        </div>
+        <input id='submit' name='submit' type="submit" value="Submit" class="form-control btn-info">
+    </form>
+  </div>
+  <div id="help">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Help</h3>
+      </div>
+      <div class="panel-body">
+        <ol>
+          <li><strong>Answer: </strong></li>
+          <ul>
+            <li>0 = Never</li>
+            <li>1 = Rarely</li>
+            <li>2 = Occasionally</li>
+            <li>3 = Frequently</li>
+            <li>4 = Very Frequently</li>
+          </ul>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="progress">
+      <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ complete }}%; min-width: 2em;">
+        {{ complete }}% Complete
+      </div>
+    </div>
+  </footer>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/main/cortical.js') }}"></script>
+{% endblock %}
