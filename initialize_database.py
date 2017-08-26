@@ -32,10 +32,11 @@ if __name__ == '__main__':
                 db.session.add(u)
                 db.session.commit()
                 # User.generate_users(20)
-                # Form.generate_forms(100)
+                Form.generate_forms(100)
                 # Researcher.generate_researchers(10)
                 print('Databases Initialized')
         else:
             print('Initialization cancelled.')
     else:
+        print('Initialization cancelled.')
         print('Initialization cancelled.')

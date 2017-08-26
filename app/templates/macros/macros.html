@@ -124,6 +124,11 @@
             <span class="glyphicon glyphicon-check"></span>
             {{ message }}
           </div>
+        {% elif category == 'warning' %}
+          <div class="alert alert-warning" role="alert">
+            <span class="glyphicon glyphicon-warning-sign"></span>
+            {{ message }}
+          </div>
         {% endif %}
       {% endfor %}
     </div>

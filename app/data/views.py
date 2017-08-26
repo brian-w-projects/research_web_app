@@ -29,9 +29,15 @@ def index():
                 filename = "{}-{}-{}".format(id, form_process[0].user.eyes, datetime.utcnow().date())
             else:
                 filename = "{}-{}".format(id, datetime.utcnow().date())
-            return excel.make_response_from_book_dict(get_xls(form_process, form_type, form.patient_data.data,
-                                                              form.intake_data.data), 'xls',
-                                                      file_name=filename)
+            if form_type == 'A':
+                return excel.make_response_from_book_dict(get_xls_A(form_process, form.patient_data.data,
+                                                      form.intake_data.data), 'xls', file_name=filename)
+            elif form_type == 'B':
+                return excel.make_response_from_book_dict(get_xls_B(form_process), 'xls', file_name=filename)
+            elif form_type == 'C':
+                return excel.make_response_from_book_dict(get_xls_C(form_process), 'xls', file_name=filename)
+            elif form_type == 'D':
+                return excel.make_response_from_book_dict(get_xls_D(form_process), 'xls', file_name=filename)
         else:
             flash(u'Please check form', 'error')
             return redirect(url_for('data.index'))
@@ -79,11 +85,49 @@ def download():
 def serve_file(patient_id, filename):
     return send_from_directory(config[os.environ.get('CONFIG') or 'development'].UPLOADED_PATIENT_DEST, patient_id+'/'+filename)
 
-
-def get_xls(process, form_type, patient_data, intake_data):
+def get_xls_D(process):
     to_ret = {}
     header = ['Patient', 'Group', 'Session', 'Date']
-    header.extend([y for x in Form.get_questions(form_type) for y in x])
+    header.extend([y for x in process[0].get_questions() for y in x])
+    build = [list(header)]
+    for single in process:
+        line = list('{} {} {} {}'.format(single.patient_id, single.user.group, single.session, single.date)[:-9].split(' '))
+        for q in sorted([one for one in single.major], key=lambda x: x.question):
+            line.append(q.response)
+        build.append(line)
+    to_ret['major'] = build
+    return to_ret
+
+def get_xls_C(process):
+    to_ret = {}
+    header = ['Patient', 'Group', 'Session', 'Date']
+    header.extend([y for x in process[0].get_questions() for y in x])
+    build = [list(header)]
+    for single in process:
+        line = list('{} {} {} {}'.format(single.patient_id, single.user.group, single.session, single.date)[:-9].split(' '))
+        for q in sorted([one for one in single.arousal], key=lambda x: x.question):
+            line.append(q.response)
+        build.append(line)
+    to_ret['arousal'] = build
+    return to_ret
+
+def get_xls_B(process):
+    to_ret = {}
+    header = ['Patient', 'Group', 'Session', 'Date']
+    header.extend([y for x in process[0].get_questions() for y in x])
+    build = [list(header)]
+    for single in process:
+        line = list('{} {} {} {}'.format(single.patient_id, single.user.group, single.session, single.date)[:-9].split(' '))
+        for q in sorted([one for one in single.cortical], key=lambda x: x.question):
+            line.append(q.response)
+        build.append(line)
+    to_ret['cortical'] = build
+    return to_ret
+
+def get_xls_A(process, patient_data, intake_data):
+    to_ret = {}
+    header = ['Patient', 'Group', 'Session', 'Date']
+    header.extend([y for x in process[0].get_questions() for y in x])
     build = [[list(header)] for x in range(4)]
     protocol_header = ['Patient', 'Group', 'Session', 'Date', 'Researcher', 'Number', 'Type', 'Sites', 'Changes', 'Frequencies', 'Label', 'Duration',
                        'Name', 'Changes', 'Frequencies', 'Label', 'Duration', 'Notes']

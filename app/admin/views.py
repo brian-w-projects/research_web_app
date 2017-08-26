@@ -136,6 +136,23 @@ def new_session():
             db.session.add(user)
             db.session.commit()
             flash(u'This patient has a new session scheduled.', 'success')
+            if clean_form_type == 'A':
+                last_major = Form.query \
+                    .filter(Form.patient_id == clean_id,
+                            Form.name == 'D')\
+                    .order_by(Form.date) \
+                    .first()
+                if last_major is None:
+                    flash(u'This patient has never had a major assessment', 'warning')
+                else:
+                    assessment_count = Form.query \
+                        .filter(Form.patient_id == clean_id,
+                                Form.date > last_major.date,
+                                Form.name == 'A') \
+                        .all()
+                    if len(assessment_count) >= 10:
+                        flash(u'It has been {} sessions since ths patient has had a major assessment'\
+                              .format(str(len(assessment_count))), 'warning')
             return redirect(url_for('admin.new_session'))
         else:
             flash(u'Please fill entire form', 'error')
@@ -294,7 +311,8 @@ def init_ajax():
     id = request.get_json(force=True)
     to_ret = {}
     sessions = Form.query \
-        .filter(Form.patient_id == id['id']) \
+        .filter(Form.patient_id == id['id'],
+                Form.name == 'A') \
         .all()
     for ele in sessions:
         if ele.protocol.first() is None:

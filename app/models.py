@@ -406,7 +406,7 @@ class Form(db.Model):
                     .first().session+1
             except:
                 s = 1
-            name = choice(['A'])
+            name = choice(['A', 'B', 'C', 'D'])
             f = Form(patient_id=u.patient_id,
                      date=form_date, name=name, session=s,
                      section=None)
@@ -417,11 +417,18 @@ class Form(db.Model):
             f.section = None
             db.session.add(f)
             db.session.commit()
-            for j in range(1,len([y for x in Form.get_questions(name) for y in x])+1):
-                q = Question(form=f, question=j,
+            for j in range(1,len([y for x in f.get_questions() for y in x])+1):
+                if f.name == 'A':
+                    q = Question(form=f, question=j,
                              intensity=randint(0,4), frequency=randint(0,4),
                              change=randint(0,2),
                              notes=forgery_py.lorem_ipsum.sentences(randint(1,3)).replace(',','-').replace(';','-') if randint(1,5) == 2 else '')
+                elif f.name == 'B':
+                    q = Cortical(form=f, question=j, response=randint(0,4))
+                elif f.name == 'C':
+                    q = Arousal(form=f, question=j, response=randint(0,1))
+                elif f.name == 'D':
+                    q = Major(form=f, question=j, response=randint(1,7))
                 db.session.add(q)
             db.session.commit()
             form_date = form_date + timedelta(days=randint(1, 5))
