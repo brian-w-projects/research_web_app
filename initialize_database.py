@@ -15,8 +15,8 @@ if __name__ == '__main__':
         print('WARNING: You will NOT be able to retrieve database information')
         if input('Please confirm (CONFIRM) ') == 'CONFIRM':
             folder = config[os.environ.get('CONFIG') or 'development'].UPLOADED_PATIENT_DEST
-	    if not os.path.exists(folder):
-		os.makedirs(folder)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
             for the_file in os.listdir(folder):
                 file_path = os.path.join(folder, the_file)
                 if os.path.isfile(file_path):
