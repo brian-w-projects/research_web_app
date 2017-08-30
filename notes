@@ -1,4 +1,26 @@
-download based on form type
-- Major
-- Arousal
-- Cortical
+This file is designed to aid in deployment of this app:
+
+This is a Flask app running a postgresql database. It can be deployed on AWS, Heroku or any other service that
+allows for python back ends.
+
+All required extensions are in the "requirements.txt" file. Using 'pip install -r requirements.txt' will
+install everything this app needs to run. Heroku does this automatically.
+
+The follow environmental variables must be set:
+ CONFIG --> deployment
+ SECRET_KEY --> any random assortment of characters (at least 20). This is used as the seed for random values
+ DATABASE_URL --> the postgres connection URL
+
+
+After the app is up and running the database can be initialize by running: 'python initialize_database.py'
+WARNING: running this will wipe all data on the app. Be sure to back up anything you need.
+The app will also ask you to create a single master account. This account can be used to create other accounts.
+The password cannot be retrieved so be certain that it is not lost.
+
+After this you can run 'python data_import.py' to import already existing self assessment data.
+In the 'import' folder you will find examples of the csv files formats for importing. The files in 'import'
+are demonstrative and can be removed or modified.
+
+Be certain that all data is correct before importing as it cannot be removed.
+
+A manual has been included for aid in using the front end of this app.

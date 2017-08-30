@@ -26,16 +26,14 @@ if __name__ == '__main__':
             with app.app_context():
                 db.drop_all()
                 db.create_all()
-                r = Researcher(role='master', email='p@p.com', password='asdfasdfasdf', first_name='master',
-                               last_name='blaster', token=None)
+                e = input('Master Account Email: ')
+                p = input('Master Account Password: ')
+                f = input('Master Account First Name: ')
+                l = input('Master Account Last Name: ')
+                r = Researcher(role='master', email=e, password=p, first_name=f,
+                               last_name=l, token=None)
                 db.session.add(r)
-                u = User(patient_id='111', first_name='bob', last_name='bob')
-                u.create_folder()
-                db.session.add(u)
                 db.session.commit()
-                # User.generate_users(20)
-                Form.generate_forms(100)
-                # Researcher.generate_researchers(10)
                 print('Databases Initialized')
         else:
             print('Initialization cancelled.')

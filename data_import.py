@@ -4,16 +4,13 @@ import os
 import csv
 
 
-def reset():
-    db.drop_all()
-    db.create_all()
-    r = Researcher(role='master', email='p@p.com', password='asdfasdfasdf', first_name='master',
-                   last_name='blaster', token=None)
-    db.session.add(r)
-
-def create_users():
+def create_users(folder):
     #create users
-    with open('/home/brian/Desktop/intensity.csv', encoding='utf-8') as i:
+    file = os.path.abspath(os.path.join(folder, 'users.csv'))
+    if not os.path.exists(file):
+        print('users.csv file does not exist.')
+        exit()
+    with open(os.path.abspath(file), encoding='utf-8') as i:
         i_reader = csv.reader(i)
         id = -1
 
@@ -21,21 +18,34 @@ def create_users():
             if row[0] == id:
                 continue
             else:
-                u = User(patient_id=row[0], first_name='a', last_name='a', group=row[1])
-                db.session.add(u)
-                db.session.commit()
-                id = row[0]
+                try:
+                    u = User(patient_id=row[0], first_name=row[1], last_name=row[2], group=row[3])
+                    db.session.add(u)
+                    db.session.commit()
+                    id = row[0]
+                except:
+                    db.session.rollback()
 
 
 app = create_app(os.environ.get('CONFIG') or 'development')
 with app.app_context():
-    reset()
-    create_users()
+    folder = os.path.abspath(os.path.join(os.path.dirname(__file__), 'import'))
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        print('import folder created. Place "users", "intensity", "frequency", "change" and "notes" csv files'
+              'inside of this folder')
+        exit()
+    create_users(folder)
 
-    with open('/home/brian/Desktop/intensity.csv', encoding='utf-8') as i,\
-            open('/home/brian/Desktop/frequency.csv', encoding='utf-8') as f, \
-            open('/home/brian/Desktop/change.csv', encoding='utf-8') as c, \
-            open('/home/brian/Desktop/notes.csv', encoding='utf-8') as n:
+    i_file = os.path.abspath(os.path.join(folder, 'intensity.csv'))
+    f_file = os.path.abspath(os.path.join(folder, 'frequency.csv'))
+    c_file = os.path.abspath(os.path.join(folder, 'change.csv'))
+    n_file = os.path.abspath(os.path.join(folder, 'notes.csv'))
+
+    with open(i_file, encoding='utf-8') as i,\
+            open(f_file, encoding='utf-8') as f, \
+            open(c_file, encoding='utf-8') as c, \
+            open(n_file, encoding='utf-8') as n:
         i_reader = csv.reader(i)
         f_reader = csv.reader(f)
         c_reader = csv.reader(c)
@@ -46,8 +56,9 @@ with app.app_context():
             db.session.add(f)
             db.session.commit()
             for num in range(4, 46):
+                notes_to_add = row[3][num] if len(row[3]) > num else ''
                 q = Question(form_id=f.id, question=num-3, intensity=row[0][num], frequency=row[1][num],
                              change=row[2][num],
-                             notes="{}".format(row[3][num]).replace(',','-').replace(';','-'))
+                             notes="{}".format(notes_to_add).replace(',','-').replace(';','-'))
                 db.session.add(q)
                 db.session.commit()
